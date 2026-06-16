@@ -1,0 +1,53 @@
+<div class="flex bg-brand-bg min-h-screen text-brand-text relative">
+  <!-- Sidebar Backdrop overlay for mobile/tablet screens -->
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="toggleSidebar()"
+    class="fixed inset-0 z-[1050] bg-black/45 lg:hidden"
+  ></div>
+
+  <!-- ال Sidebar هنا -->
+  <app-sidebar
+    class="z-[1100] transition-transform duration-300"
+    [class.-translate-x-full]="!isSidebarOpen"
+    [class.translate-x-0]="isSidebarOpen"
+  ></app-sidebar>
+  
+  <!-- Content Wrapper -->
+  <div class="flex-1 flex flex-col min-h-screen transition-all duration-300"
+       [class.lg:ml-64]="isSidebarOpen"
+       [class.ml-0]="!isSidebarOpen">
+    <!-- Top Navbar -->
+    <header class="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-brand-border bg-brand-surface px-8 text-brand-text">
+      <div class="flex items-center gap-3">
+        <button
+          (click)="toggleSidebar()"
+          class="lg:hidden flex flex-col items-center justify-center w-8 h-8 rounded-full border-0 bg-transparent text-inherit hover:bg-brand-surface-light cursor-pointer"
+          aria-label="Toggle Sidebar"
+        >
+          <span class="block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+          <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+          <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+        </button>
+        <div class="text-base font-semibold text-brand-text-primary">
+          Worker Portal
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Language Switcher -->
+        <button (click)="langService.toggle()" class="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-border bg-brand-surface-light text-brand-muted hover:text-brand-text-primary transition-all cursor-pointer" [attr.aria-label]="langService.lang() === 'en' ? 'Switch to Arabic' : 'Switch to English'">
+          <span class="text-xs font-bold">{{ langService.lang() === 'en' ? 'ع' : 'EN' }}</span>
+        </button>
+        <!-- Theme Switcher -->
+        <button (click)="toggleTheme()" class="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-border bg-brand-surface-light text-brand-muted hover:text-brand-text-primary transition-all cursor-pointer" aria-label="Toggle Theme">
+          <fa-icon [icon]="(isDarkMode) ? ['fas', 'sun'] : ['fas', 'moon']"></fa-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- المحتوى هنا (هنا اللي هيظهر فيه التاسكات) -->
+    <main class="flex-1 p-8 overflow-auto">
+      <router-outlet></router-outlet>
+    </main>
+  </div>
+</div>

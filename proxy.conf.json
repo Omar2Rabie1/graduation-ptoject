@@ -1,0 +1,15 @@
+{
+  "/api": {
+    "target": "https://irs-main.runasp.net",
+    "secure": false,
+    "changeOrigin": true
+  },
+  "/ai-api": {
+    "target": "https://mostafa-abuhamed-irs-ai.hf.space",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite": {
+      "^/ai-api": ""
+    }
+  }
+}

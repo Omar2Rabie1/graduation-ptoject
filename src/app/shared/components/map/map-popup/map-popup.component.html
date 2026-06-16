@@ -1,0 +1,70 @@
+<div class="bg-brand-surface glass-panel text-brand-text font-sans p-4 rounded-[16px] border border-brand-border shadow-2xl relative overflow-hidden">
+  
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="flex flex-col items-center justify-center py-6 gap-3">
+    <div class="w-6 h-6 border-2 border-brand-primary/30 border-t-brand-primary rounded-full animate-spin"></div>
+    <span class="text-xs text-brand-muted font-medium">Loading details...</span>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="hasError" class="flex flex-col items-center justify-center py-6 gap-2 text-red-400 text-center">
+    <fa-icon [icon]="['fas', 'triangle-exclamation']" class="text-xl mb-1"></fa-icon>
+    <span class="text-[11px] font-medium leading-tight px-2">{{ errorMessage }}</span>
+    <button (click)="fetchDetails()" class="mt-2 text-[10px] uppercase font-bold tracking-wider text-brand-primary hover:text-brand-primary-hover underline decoration-brand-primary/30 underline-offset-4">Retry</button>
+  </div>
+
+  <!-- Content State -->
+  <div *ngIf="!isLoading && !hasError && details" class="animate-fade-in flex flex-col gap-3.5">
+    
+    <div class="flex items-center justify-between gap-2 border-b border-brand-border pb-3">
+      <div class="flex flex-col gap-1">
+        <h4 class="text-xs font-bold text-white uppercase tracking-wider">Report Details</h4>
+        <span class="inline-block self-start bg-brand-surface-light border border-brand-border text-brand-muted text-[10px] font-black tracking-widest px-2 py-0.5 rounded-md">#{{ displayId }}</span>
+      </div>
+      <span *ngIf="details.status" [class]="getStatusClass(details.status)" class="text-[9px] font-black px-2.5 py-1 rounded-full uppercase tracking-widest shrink-0">
+        {{ details.status | translate }}
+      </span>
+    </div>
+
+    <!-- Details Body -->
+    <div class="flex flex-col gap-3 text-xs">
+      <div *ngIf="details.categoryName" class="flex flex-col gap-0.5">
+        <span class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Category</span>
+        <span class="text-white font-medium text-[13px]">{{ details.categoryName | translate }}</span>
+      </div>
+
+      <div *ngIf="details.description" class="flex flex-col gap-0.5">
+        <span class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Description</span>
+        <p class="text-brand-text leading-relaxed text-[11px] line-clamp-3 bg-brand-surface-light/40 p-2 rounded-lg border border-brand-border/50">{{ details.description }}</p>
+      </div>
+
+      <div *ngIf="details.address" class="flex flex-col gap-0.5">
+        <span class="text-[10px] font-bold text-brand-muted uppercase tracking-wider">Location</span>
+        <div class="flex items-center gap-1.5 text-brand-text text-[11px] leading-tight">
+          <fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary shrink-0"></fa-icon>
+          <span class="truncate" [title]="details.address">{{ details.address }}</span>
+        </div>
+      </div>
+    </div>
+    
+    <!-- User Mode Interactions -->
+    <div *ngIf="isUserMode" class="mt-2 pt-3 border-t border-brand-border">
+      <div *ngIf="supportCount" class="text-[11px] font-bold text-brand-primary mb-2">
+        <fa-icon [icon]="['fas', 'fire']" class="text-brand-primary-hover mr-1"></fa-icon>
+        +{{ supportCount }} persons face this issue
+      </div>
+      <button (click)="onSupportClick()" class="w-full bg-brand-primary hover:bg-brand-primary-hover text-white py-2 rounded-lg text-xs font-bold transition-colors">
+        I Face This Too
+      </button>
+    </div>
+
+    <!-- Authority Mode Interactions -->
+    <div *ngIf="!isUserMode" class="mt-2">
+      <button (click)="onViewDetails()" class="w-full bg-blue-600/20 hover:bg-blue-600/30 text-blue-400 border border-blue-500/30 py-2 rounded-lg text-xs font-bold transition-colors">
+        Open Report Details
+      </button>
+    </div>
+
+  </div>
+
+</div>

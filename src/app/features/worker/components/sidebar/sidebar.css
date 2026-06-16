@@ -1,0 +1,13 @@
+/* ستايل العنصر النشط (Active) */
+.active {
+    background-color: var(--color-primary-tint); /* خلفية برتقالية شفافة */
+    color: var(--color-primary); /* لون الخط برتقالي */
+    border-left: 3px solid var(--color-primary); /* خط على الشمال عشان يبان مظبوط */
+    padding-left: 0.75rem; /* ضبط المسافة مع الخط */
+}
+
+/* ستايل عام للينكات عشان تاخد اللون */
+a {
+    text-decoration: none;
+    display: flex;
+}

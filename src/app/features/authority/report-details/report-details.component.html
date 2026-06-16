@@ -1,0 +1,186 @@
+<section
+  class="flex min-h-0 w-full flex-1 flex-col overflow-hidden text-brand-text"
+>
+  <header class="mb-4 shrink-0">
+    <button
+      type="button"
+      class="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-brand-border bg-brand-surface-light px-[0.85rem] py-[0.45rem] text-sm text-brand-text transition-colors hover:bg-brand-border hover:text-brand-text-primary"
+      (click)="close()"
+    >
+      <fa-icon [icon]="['fas', 'arrow-left']" aria-hidden="true"></fa-icon>
+      <span>{{ 'backToMap' | translate }}</span>
+    </button>
+  </header>
+
+  <div
+    class="relative mx-auto box-border flex min-h-0 w-full max-w-[1200px] flex-1 flex-wrap items-start justify-center gap-5 overflow-y-auto overflow-x-hidden pb-4 [overscroll-behavior-y:contain]"
+  >
+    <article
+      class="max-w-[720px] flex-[1_1_520px] rounded-2xl border border-brand-border bg-brand-surface px-7 py-6 text-brand-text shadow-xl"
+    >
+      <div class="mb-2">
+        <span
+          class="inline-block rounded-full px-[0.65rem] py-1 text-[0.7rem] font-semibold uppercase tracking-[0.06em]"
+          [ngClass]="{
+            'border border-amber-400/45 bg-amber-400/20 text-yellow-300': report.status === 'SUBMITTED',
+            'border border-green-400/45 bg-green-400/20 text-green-300': report.status === 'COMPLETED' || report.status === 'FIXED' || report.status === 'RESOLVED',
+            'border border-blue-400/45 bg-blue-400/20 text-blue-300': report.status !== 'SUBMITTED' && report.status !== 'COMPLETED' && report.status !== 'FIXED' && report.status !== 'RESOLVED'
+          }"
+        >
+          {{ report.status | translate }}
+        </span>
+      </div>
+      <h1 class="mt-1.5 text-[1.35rem] font-bold text-brand-text-primary">
+        #{{ reportId }} {{ report.title | translate }}
+      </h1>
+      <div class="mt-1.5 flex items-center gap-2 text-sm text-brand-muted">
+        <fa-icon [icon]="['far', 'clock']"></fa-icon>
+        <span>{{ 'reported' | translate }} {{ report.reporterTime }}</span>
+      </div>
+
+      <div class="mt-5">
+        <div class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+          {{ 'attachedPhotos' | translate }} ({{ report.images.length || 0 }})
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="!report.images || report.images.length === 0" 
+             class="flex min-h-[120px] flex-col items-center justify-center rounded-xl border border-dashed border-brand-border bg-brand-bg/20 p-4 text-center">
+          <fa-icon [icon]="['far', 'image']" class="text-xl text-brand-muted mb-1.5" aria-hidden="true"></fa-icon>
+          <span class="text-xs text-brand-muted">{{ 'noPhotosAttached' | translate }}</span>
+        </div>
+
+        <!-- Images Grid -->
+        <div *ngIf="report.images && report.images.length > 0" class="grid grid-cols-2 gap-2 md:grid-cols-4">
+          <div *ngFor="let img of report.images.slice(0, 4); let idx = index" class="relative aspect-[4/3] overflow-hidden rounded-lg border border-brand-border bg-brand-bg">
+            <img [src]="img" class="h-full w-full object-cover" alt="Site photo">
+            <!-- More Overlay -->
+            <div *ngIf="idx === 3 && report.images.length > 4" 
+                 class="absolute inset-0 flex items-center justify-center bg-black/75 text-xs font-bold text-white">
+              +{{ report.images.length - 4 }} {{ 'more' | translate }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="mt-5">
+        <div class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+          {{ 'description' | translate }}
+        </div>
+        <div
+          class="rounded-xl border border-brand-border bg-brand-bg/50 p-4 text-sm leading-[1.55] text-brand-text"
+        >
+          {{ report.description | translate }}
+        </div>
+      </div>
+
+      <div class="mt-5" *ngIf="markers().length > 0">
+        <div class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+          {{ 'mapPreview' | translate }}
+        </div>
+        <div
+          class="overflow-hidden rounded-xl border border-brand-border bg-brand-bg/40"
+        >
+          <app-map [markers]="markers()" [mapContainerClass]="mapContainerClass" />
+        </div>
+      </div>
+
+      <div class="mt-5 grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div class="rounded-xl border border-brand-border bg-brand-bg/50 p-4">
+          <div class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+            {{ 'location' | translate }}
+          </div>
+          <div class="mt-1.5 flex items-start gap-2.5">
+            <fa-icon [icon]="['fas', 'location-dot']" class="mt-0.5 text-orange-500"></fa-icon>
+            <div>
+              <div class="text-[0.9rem] font-semibold leading-snug">{{ report.location | translate }}</div>
+              <div class="mt-0.5 text-xs text-brand-muted" *ngIf="report.lat && report.lng">
+                {{ 'coordinates' | translate }}: {{ report.lat }}, {{ report.lng }}
+              </div>
+            </div>
+          </div>
+          <a
+            *ngIf="report.lat && report.lng"
+            class="mt-2.5 inline-block cursor-pointer text-xs text-orange-400 no-underline hover:underline"
+            [href]="'https://www.google.com/maps/search/?api=1&query=' + report.lat + ',' + report.lng"
+            target="_blank"
+            >{{ 'openGoogleMaps' | translate }}</a
+          >
+        </div>
+        <div class="rounded-xl border border-brand-border bg-brand-bg/50 p-4">
+          <div class="mb-2 text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+            {{ 'reportedBy' | translate }}
+          </div>
+          <div class="mt-1.5 flex items-start gap-2.5">
+            <div
+              class="flex size-10 shrink-0 items-center justify-center rounded-full bg-brand-surface-light text-brand-text-primary text-sm font-bold"
+            >
+              {{ report.reporterInitials || 'U' }}
+            </div>
+            <div>
+              <div class="text-[0.9rem] font-semibold">{{ report.reporterName }} ({{ 'citizen' | translate }})</div>
+              <div class="mt-0.5 text-xs text-brand-muted">{{ 'viaMobileApp' | translate }} • {{ report.reporterTime }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <aside
+      class="w-full max-w-full flex-[1_1_100%] md:flex-[0_0_300px] rounded-2xl border border-brand-border bg-brand-surface p-4 pb-4 pt-4 shadow-xl"
+    >
+      <div
+        class="mb-4 flex items-center gap-2 border-b border-brand-border pb-3"
+      >
+        <span class="text-xs font-bold uppercase tracking-[0.06em] text-brand-text-primary"
+          >{{ 'availableWorkers' | translate }}</span
+        >
+        <span
+          class="ml-auto rounded-full border border-orange-400/40 bg-orange-500/25 px-[0.45rem] py-0.5 text-[0.7rem] font-bold text-orange-300"
+          >{{ workerListCount() }}</span
+        >
+      </div>
+
+      <div class="flex flex-col gap-3">
+        <div
+          class="rounded-xl border border-brand-border bg-brand-bg/50 p-[0.85rem]"
+          *ngFor="let w of workers"
+        >
+          <div class="flex items-start justify-between gap-2">
+            <div class="flex items-center gap-2.5">
+              <div
+                class="flex size-9 shrink-0 items-center justify-center rounded-full bg-brand-surface-light text-brand-text-primary text-[0.65rem] font-bold"
+              >
+                {{ w.id }}
+              </div>
+              <div>
+                <div class="text-[0.9rem] font-semibold text-brand-text-primary">{{ w.name }}</div>
+                <div class="mt-0.5 text-xs text-brand-muted">{{ w.role | translate }}</div>
+              </div>
+            </div>
+            <span
+              class="whitespace-nowrap text-right text-[0.7rem] text-green-300"
+              [class.text-red-400]="w.status === 'busy'"
+            >
+              {{ (w.status === 'busy' ? 'busy' : 'available') | translate }}
+            </span>
+          </div>
+          <button
+            *ngIf="w.status === 'available' && report.status === 'SUBMITTED'"
+            type="button"
+            class="mt-2.5 w-full cursor-pointer rounded-full border-0 bg-brand-primary px-3 py-2 text-xs font-bold uppercase tracking-[0.04em] text-white shadow-lg shadow-brand-primary/20 transition-all hover:bg-brand-primary-hover hover:brightness-105"
+            (click)="assignWorker(w.id)"
+          >
+            {{ 'assignTask' | translate }}
+          </button>
+          <div
+            *ngIf="w.status === 'available' && report.status !== 'SUBMITTED'"
+            class="mt-2.5 w-full rounded-full border border-brand-border bg-brand-surface-light px-3 py-2 text-center text-xs font-semibold uppercase tracking-[0.04em] text-brand-muted select-none"
+          >
+            {{ 'assignmentLocked' | translate }}
+          </div>
+        </div>
+      </div>
+    </aside>
+  </div>
+</section>

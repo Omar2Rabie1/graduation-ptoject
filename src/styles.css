@@ -1,0 +1,176 @@
+/* You can add global styles to this file, and also import other style files */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Default to Dark Mode values */
+  --bg-page: #030813;
+  --bg-surface: #060f1c;
+  --bg-card: #060f1c;
+  --bg-sidebar: #060f1c;
+  --bg-sidebar-active: #081222;
+
+  --color-primary: #F27A42;
+  --color-primary-hover: #E0652D;
+  --color-primary-tint: rgba(242, 122, 66, 0.16);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #dce8fb;
+  --text-muted: #8ea4bf;
+  --text-on-primary: #FFFFFF;
+
+  --border-default: #162436;
+  --border-strong: #1e2e43;
+
+  --badge-assigned-bg: rgba(59, 130, 246, 0.1);
+  --badge-assigned-text: #3B82F6;
+
+  --badge-priority-bg: rgba(217, 119, 6, 0.15);
+  --badge-priority-text: #D97706;
+
+  --btn-outline-bg: transparent;
+  --btn-outline-border: #162436;
+  --chip-bg: #081222;
+  --chip-text: #8ea4bf;
+
+  /* RGB numbers for Tailwind opacity modifiers */
+  --bg-page-rgb: 3, 8, 19;
+  --bg-surface-rgb: 6, 15, 28;
+  --bg-card-rgb: 6, 15, 28;
+  --bg-sidebar-rgb: 6, 15, 28;
+  --bg-sidebar-active-rgb: 8, 18, 34;
+  --color-primary-rgb: 242, 122, 66;
+  --color-primary-hover-rgb: 224, 101, 45;
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 220, 232, 251;
+  --text-muted-rgb: 142, 164, 191;
+  --border-default-rgb: 22, 36, 54;
+  --border-strong-rgb: 30, 46, 67;
+}
+
+[data-theme="light"] {
+  --bg-page: #F5F5F5;
+  --bg-surface: #FFFFFF;
+  --bg-card: #FFFFFF;
+  --bg-sidebar: #FFFFFF;
+  --bg-sidebar-active: #FFF4F0;
+
+  --color-primary: #FF5C1A;
+  --color-primary-hover: #E04F15;
+  --color-primary-tint: #FFF4F0;
+
+  --text-primary: #1A1A1A;
+  --text-secondary: #555555;
+  --text-muted: #999999;
+  --text-on-primary: #FFFFFF;
+
+  --border-default: #E8E8E8;
+  --border-strong: #D0D0D0;
+
+  --badge-assigned-bg: #E8F4FF;
+  --badge-assigned-text: #3B82F6;
+
+  --badge-priority-bg: #FFF7E0;
+  --badge-priority-text: #D97706;
+
+  --btn-outline-bg: #FFFFFF;
+  --btn-outline-border: #D0D0D0;
+  --chip-bg: #F0F0F0;
+  --chip-text: #555555;
+
+  /* RGB equivalents for Tailwind Opacity Modifiers */
+  --bg-page-rgb: 245, 245, 245;
+  --bg-surface-rgb: 255, 255, 255;
+  --bg-card-rgb: 255, 255, 255;
+  --bg-sidebar-rgb: 255, 255, 255;
+  --bg-sidebar-active-rgb: 255, 244, 240;
+  --color-primary-rgb: 255, 92, 26;
+  --color-primary-hover-rgb: 224, 79, 21;
+  --text-primary-rgb: 26, 26, 26;
+  --text-secondary-rgb: 85, 85, 85;
+  --text-muted-rgb: 153, 153, 153;
+  --border-default-rgb: 232, 232, 232;
+  --border-strong-rgb: 208, 208, 208;
+}
+
+[data-theme="dark"] {
+  --bg-page: #030813;
+  --bg-surface: #060f1c;
+  --bg-card: #060f1c;
+  --bg-sidebar: #060f1c;
+  --bg-sidebar-active: #081222;
+
+  --color-primary: #F27A42;
+  --color-primary-hover: #E0652D;
+  --color-primary-tint: rgba(242, 122, 66, 0.16);
+
+  --text-primary: #FFFFFF;
+  --text-secondary: #dce8fb;
+  --text-muted: #8ea4bf;
+  --text-on-primary: #FFFFFF;
+
+  --border-default: #162436;
+  --border-strong: #1e2e43;
+
+  --badge-assigned-bg: rgba(59, 130, 246, 0.1);
+  --badge-assigned-text: #3B82F6;
+
+  --badge-priority-bg: rgba(217, 119, 6, 0.15);
+  --badge-priority-text: #D97706;
+
+  --btn-outline-bg: transparent;
+  --btn-outline-border: #162436;
+  --chip-bg: #081222;
+  --chip-text: #8ea4bf;
+
+  /* RGB equivalents for Tailwind Opacity Modifiers */
+  --bg-page-rgb: 3, 8, 19;
+  --bg-surface-rgb: 6, 15, 28;
+  --bg-card-rgb: 6, 15, 28;
+  --bg-sidebar-rgb: 6, 15, 28;
+  --bg-sidebar-active-rgb: 8, 18, 34;
+  --color-primary-rgb: 242, 122, 66;
+  --color-primary-hover-rgb: 224, 101, 45;
+  --text-primary-rgb: 255, 255, 255;
+  --text-secondary-rgb: 220, 232, 251;
+  --text-muted-rgb: 142, 164, 191;
+  --border-default-rgb: 22, 36, 54;
+  --border-strong-rgb: 30, 46, 67;
+}
+
+/* Smooth transition for theme variables */
+:root,
+body,
+aside,
+header,
+main,
+div.glass-panel,
+article,
+nav,
+input,
+select,
+textarea,
+button,
+a,
+span {
+  transition: background-color 0.2s ease, color 0.2s ease, border-color 0.2s ease;
+}
+
+@layer base {
+  body {
+    @apply bg-brand-bg text-brand-text font-sans antialiased;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-brand-surface/80 backdrop-blur-md border border-brand-border shadow-xl;
+  }
+}
+
+/* Custom Scrollbar Styling */
+::-webkit-scrollbar { width: 6px; height: 6px; }
+::-webkit-scrollbar-track { background: theme('colors.brand.bg'); }
+::-webkit-scrollbar-thumb { background: theme('colors.brand.border'); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: theme('colors.brand.primary'); }

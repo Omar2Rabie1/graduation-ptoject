@@ -1,0 +1,49 @@
+<header
+  class="sticky top-0 z-10 flex h-16 shrink-0 items-center justify-between border-b border-brand-border bg-brand-surface glass-panel px-5 text-brand-text-primary backdrop-blur-[18px]"
+>
+  <button
+    type="button"
+    class="relative mr-3 inline-flex size-8 flex-col items-center justify-center rounded-full border-0 bg-transparent text-inherit transition-[background,transform] duration-150 ease-out hover:-translate-y-px hover:bg-brand-surface-light lg:hidden"
+    (click)="toggleSidebar.emit()"
+    aria-label="Toggle sidebar"
+  >
+    <span class="block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+    <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+    <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+  </button>
+
+  <div class="text-base font-semibold">
+    {{ (title || 'liveMap') | translate }}
+  </div>
+
+  <div class="flex items-center gap-2">
+    <button
+      type="button"
+      class="relative inline-flex size-8 items-center justify-center rounded-full border-0 bg-transparent text-inherit transition-[background,transform] duration-150 ease-out hover:-translate-y-px hover:bg-brand-surface-light"
+      (click)="langService.toggle()"
+      [attr.aria-label]="(langService.lang() === 'en' ? 'switchToArabic' : 'switchToEnglish') | translate"
+    >
+      <span class="text-xs font-bold">{{ langService.lang() === 'en' ? 'ع' : 'EN' }}</span>
+    </button>
+
+    <button
+      type="button"
+      class="relative inline-flex size-8 items-center justify-center rounded-full border-0 bg-transparent text-inherit transition-[background,transform] duration-150 ease-out hover:-translate-y-px hover:bg-brand-surface-light"
+      (click)="toggleDarkMode.emit()"
+      aria-label="Toggle dark mode"
+    >
+      <fa-icon [icon]="(isDarkMode) ? ['fas', 'sun'] : ['fas', 'moon']"></fa-icon>
+    </button>
+
+    <button
+      type="button"
+      class="relative inline-flex size-8 items-center justify-center rounded-full border-0 bg-transparent text-inherit transition-[background,transform] duration-150 ease-out hover:-translate-y-px hover:bg-brand-surface-light"
+      aria-label="Notifications"
+    >
+      <fa-icon [icon]="['far', 'bell']"></fa-icon>
+      <span
+        class="pointer-events-none absolute right-1.5 top-1.5 size-2 rounded-full bg-brand-primary shadow-[0_0_0_2px_theme('colors.brand.surface')]"
+      ></span>
+    </button>
+  </div>
+</header>

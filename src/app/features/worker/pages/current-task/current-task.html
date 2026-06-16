@@ -1,0 +1,227 @@
+<div class="flex min-h-full flex-col gap-6 text-brand-text animate-fade-in">
+  <header class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h1 class="m-0 text-xl font-semibold text-brand-text-primary">{{ 'currentTask' | translate }}</h1>
+      <p class="mt-1 text-sm text-brand-muted">
+        {{ 'activeAssignmentSub' | translate }}
+      </p>
+    </div>
+    <button
+      type="button"
+      class="inline-flex items-center gap-2 rounded-lg border border-brand-border bg-brand-surface px-4 py-2 text-sm text-brand-muted transition-all hover:border-brand-primary/50 hover:bg-brand-surface-light hover:text-brand-text-primary disabled:cursor-not-allowed disabled:opacity-50"
+      (click)="refresh()"
+      [disabled]="loading()"
+    >
+      <fa-icon [icon]="['fas', 'rotate-right']" [animation]="loading() ? 'spin' : undefined"></fa-icon>
+      {{ 'refresh' | translate }}
+    </button>
+  </header>
+
+  @if (loading()) {
+    <div
+      class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-brand-border bg-brand-surface glass-panel py-20"
+    >
+      <div
+        class="size-10 animate-spin rounded-full border-2 border-brand-border border-t-brand-primary"
+      ></div>
+      <p class="text-sm text-brand-muted">{{ 'loadingCurrentTask' | translate }}</p>
+    </div>
+  }
+
+  @if (!loading() && error()) {
+    <div
+      class="flex flex-col items-center justify-center gap-4 rounded-2xl border border-red-500/30 bg-red-500/5 glass-panel px-6 py-16 text-center"
+    >
+      <fa-icon [icon]="['fas', 'triangle-exclamation']" class="text-3xl text-amber-400"></fa-icon>
+      <p class="max-w-md text-sm text-red-300">{{ error() }}</p>
+      <button
+        type="button"
+        class="rounded-lg bg-brand-primary px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-brand-primary-hover"
+        (click)="refresh()"
+      >
+        {{ 'tryAgain' | translate }}
+      </button>
+    </div>
+  }
+
+  @if (!loading() && !error() && !currentTask()) {
+    <div
+      class="flex flex-col items-center justify-center gap-3 rounded-2xl border border-brand-border bg-brand-surface glass-panel px-6 py-20 text-center"
+    >
+      <fa-icon [icon]="['fas', 'clipboard-list']" class="text-4xl opacity-80 text-brand-primary"></fa-icon>
+      <h3 class="m-0 text-lg font-semibold text-brand-text-primary">{{ 'noActiveTask' | translate }}</h3>
+      <p class="m-0 max-w-sm text-sm text-brand-muted">
+        {{ (message() || 'No current task assigned to you') | translate }}
+      </p>
+      <p class="m-0 text-xs text-brand-muted/80">
+        {{ 'tasksAppearHere' | translate }}
+      </p>
+    </div>
+  }
+
+  @if (!loading() && !error() && currentTask(); as task) {
+    <article
+      class="glass-panel overflow-hidden rounded-2xl border border-brand-border bg-brand-surface"
+    >
+      <div
+        class="flex flex-wrap items-center justify-between gap-3 border-b border-brand-border bg-brand-surface-light/50 px-6 py-4"
+      >
+        <span
+          class="rounded-full border border-brand-primary/40 bg-brand-primary/10 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-brand-primary"
+        >
+          {{ task.status | translate }}
+        </span>
+        @if (task.id) {
+          <span
+            class="font-mono text-xs text-brand-muted"
+          >#{{ task.id }}</span>
+        }
+      </div>
+
+      <div class="flex flex-col gap-6 p-6 lg:flex-row">
+        <div class="min-w-0 flex-1 space-y-5">
+          <div>
+            <h2 class="m-0 text-xl font-bold text-brand-text-primary">
+              {{ (task.title || 'Untitled Task') | translate }}
+            </h2>
+            <p class="mt-2 text-sm leading-relaxed text-brand-muted">
+              {{ (task.description || 'No description provided.') | translate }}
+            </p>
+          </div>
+
+          @if (task.location) {
+            <div
+              class="flex items-start gap-3 rounded-xl border border-brand-border bg-brand-bg/60 px-4 py-3"
+            >
+              <fa-icon [icon]="['fas', 'location-dot']" class="mt-0.5 text-brand-primary"></fa-icon>
+              <div>
+                <p class="m-0 text-xs uppercase tracking-wide text-brand-muted">
+                  {{ 'location' | translate }}
+                </p>
+                <p class="m-0 mt-1 text-sm text-brand-text-primary">
+                  {{ (task.location.address || 'Location available') | translate }}
+                </p>
+              </div>
+            </div>
+          }
+
+          <div
+            class="flex flex-wrap gap-4 border-t border-brand-border pt-4 text-xs text-brand-muted"
+          >
+            @if (task.assignedDate) {
+              <span>
+                <fa-icon [icon]="['far', 'calendar']" class="mr-1"></fa-icon>
+                {{ 'assignedTime' | translate }} {{ task.assignedDate | date: 'mediumDate' }}
+              </span>
+            }
+            @if (task.dueDate) {
+              <span>
+                <fa-icon [icon]="['far', 'clock']" class="mr-1"></fa-icon>
+                {{ 'due' | translate }} {{ task.dueDate | date: 'mediumDate' }}
+              </span>
+            }
+          </div>
+        </div>
+
+        @if (task.images?.length) {
+          <div class="w-full shrink-0 lg:w-56">
+            <p class="mb-3 text-sm font-medium text-brand-muted">
+              {{ 'attachedPhotos' | translate }}
+            </p>
+            <div class="grid grid-cols-2 gap-2">
+              @for (img of task.images; track img) {
+                <div
+                  class="aspect-square overflow-hidden rounded-lg border border-brand-border bg-brand-bg"
+                >
+                  <img
+                    [src]="img"
+                    alt="Task attachment"
+                    class="size-full object-cover"
+                  />
+                </div>
+              }
+            </div>
+          </div>
+        }
+      </div>
+
+      <div
+        class="flex flex-wrap gap-3 border-t border-brand-border bg-brand-bg/40 px-6 py-4"
+      >
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-lg bg-brand-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-brand-primary-hover disabled:cursor-not-allowed disabled:opacity-60"
+          (click)="markAsFixed()"
+          [disabled]="isSubmitting()"
+        >
+          @if (isSubmitting()) {
+            <span
+              class="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+            ></span>
+          } @else {
+            <fa-icon [icon]="['fas', 'check']"></fa-icon>
+          }
+          {{ 'markAsFixed' | translate }}
+        </button>
+
+        <button
+          type="button"
+          class="inline-flex items-center justify-center gap-2 rounded-lg border border-brand-border bg-brand-surface px-6 py-2.5 text-sm text-brand-muted transition-all hover:border-red-500/50 hover:bg-red-500/10 hover:text-red-400 disabled:cursor-not-allowed disabled:opacity-60"
+          (click)="openReturnModal()"
+          [disabled]="isSubmitting()"
+        >
+          <fa-icon [icon]="['fas', 'rotate-left']"></fa-icon>
+          {{ 'markBlocked' | translate }}
+        </button>
+      </div>
+    </article>
+  }
+
+  @if (showReturnModal()) {
+    <div
+      class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4 backdrop-blur-sm"
+      (click)="closeReturnModal()"
+    >
+      <div
+        class="glass-panel w-full max-w-md rounded-2xl border border-brand-border bg-brand-surface p-6 shadow-2xl"
+        (click)="$event.stopPropagation()"
+      >
+        <h3 class="m-0 text-lg font-semibold text-brand-text-primary">{{ 'markAsBlocked' | translate }}</h3>
+        <p class="mt-2 text-sm text-brand-muted">
+          {{ 'explainBlocked' | translate }}
+        </p>
+
+        <textarea
+          class="mt-4 w-full resize-none rounded-lg border border-brand-border bg-brand-bg px-3 py-2.5 text-sm text-brand-text-primary outline-none placeholder:text-brand-muted/60 focus:border-brand-primary focus:ring-1 focus:ring-brand-primary"
+          rows="4"
+          [placeholder]="'enterReason' | translate"
+          [ngModel]="returnNotes()"
+          (ngModelChange)="returnNotes.set($event)"
+        ></textarea>
+
+        <div class="mt-5 flex justify-end gap-3">
+          <button
+            type="button"
+            class="rounded-lg border border-brand-border px-4 py-2 text-sm text-brand-muted transition-colors hover:bg-brand-surface-light hover:text-brand-text-primary"
+            (click)="closeReturnModal()"
+          >
+            {{ 'cancel' | translate }}
+          </button>
+          <button
+            type="button"
+            class="inline-flex items-center gap-2 rounded-lg bg-red-600 px-4 py-2 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:cursor-not-allowed disabled:opacity-60"
+            (click)="returnTask()"
+            [disabled]="isSubmitting() || !returnNotes().trim()"
+          >
+            @if (isSubmitting()) {
+              <span
+                class="size-4 animate-spin rounded-full border-2 border-white/30 border-t-white"
+              ></span>
+            }
+            {{ 'confirmBlocked' | translate }}
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+</div>

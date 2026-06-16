@@ -1,0 +1,44 @@
+<!-- Logo Area -->
+<div class="logo p-6 border-b border-brand-border shrink-0">
+    <h1 class="text-xl font-bold text-brand-text-primary">SMART CITY</h1>
+</div>
+
+<!-- Menu -->
+<ul class="menu flex-1 p-4 space-y-2 overflow-y-auto">
+    
+    <!-- Tasks Link -->
+    <li>
+        <a routerLink="/worker/tasks" routerLinkActive="bg-brand-surface-light text-brand-primary border-r-2 border-brand-primary"
+           class="flex items-center gap-3 p-3 rounded-lg text-brand-muted hover:bg-brand-surface-light hover:text-brand-text-primary transition-all cursor-pointer">
+            <fa-icon [icon]="['fas', 'list-check']"></fa-icon>
+            <span>{{ 'tasks' | translate }}</span>
+        </a>
+    </li>
+
+    <!-- Current Task Link -->
+    <li>
+        <a routerLink="/worker/current-task" routerLinkActive="bg-brand-surface-light text-brand-primary border-r-2 border-brand-primary"
+           class="flex items-center gap-3 p-3 rounded-lg text-brand-muted hover:bg-brand-surface-light hover:text-brand-text-primary transition-all cursor-pointer">
+            <fa-icon [icon]="['fas', 'bolt']"></fa-icon>
+            <span>{{ 'currentTask' | translate }}</span>
+        </a>
+    </li>
+
+    <!-- History Link -->
+    <li>
+        <a routerLink="/worker/history" routerLinkActive="bg-brand-surface-light text-brand-primary border-r-2 border-brand-primary"
+           class="flex items-center gap-3 p-3 rounded-lg text-brand-muted hover:bg-brand-surface-light hover:text-brand-text-primary transition-all cursor-pointer">
+            <fa-icon [icon]="['fas', 'clock-rotate-left']"></fa-icon>
+            <span>{{ 'history' | translate }}</span>
+        </a>
+    </li>
+    
+</ul>
+
+<!-- Bottom Section -->
+<div class="p-4 border-t border-brand-border mt-auto space-y-2 shrink-0">
+     <button type="button" (click)="logout()" class="flex w-full items-center gap-3 p-3 rounded-lg text-brand-muted hover:bg-red-500/10 hover:text-red-400 transition-all cursor-pointer border-0 bg-transparent text-left">
+        <fa-icon [icon]="['fas', 'right-from-bracket']"></fa-icon>
+        <span>{{ 'logout' | translate }}</span>
+    </button>
+</div>

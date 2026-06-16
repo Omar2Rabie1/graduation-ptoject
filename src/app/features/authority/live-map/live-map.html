@@ -1,0 +1,60 @@
+<section class="flex min-h-0 flex-1 flex-col gap-3">
+  <header
+    class="flex flex-wrap items-center justify-between gap-4 text-brand-text max-md:items-start"
+  >
+    <div class="flex flex-wrap items-center gap-[0.35rem] max-md:w-full max-md:justify-start">
+      <button
+        type="button"
+        (click)="clearFilters()"
+        class="cursor-pointer rounded-full border border-brand-border bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-brand-text transition-colors hover:bg-brand-surface-light hover:text-brand-text-primary"
+      >
+        {{ 'all' | translate }}
+      </button>
+
+      <button
+        type="button"
+        (click)="toggleType('Road')"
+        class="cursor-pointer rounded-full border border-orange-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-orange-500 transition-all hover:-translate-y-px hover:brightness-110"
+        [class.opacity-50]="!isTypeSelected('Road') && typeFilter().size > 0"
+      >
+        {{ 'road' | translate }}
+      </button>
+      <button
+        type="button"
+        (click)="toggleType('Power')"
+        class="cursor-pointer rounded-full border border-yellow-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-yellow-500 transition-all hover:-translate-y-px hover:brightness-110"
+        [class.opacity-50]="!isTypeSelected('Power') && typeFilter().size > 0"
+      >
+        {{ 'electrical' | translate }}
+      </button>
+      <button
+        type="button"
+        (click)="toggleType('Water')"
+        class="cursor-pointer rounded-full border border-green-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-green-500 transition-all hover:-translate-y-px hover:brightness-110"
+        [class.opacity-50]="!isTypeSelected('Water') && typeFilter().size > 0"
+      >
+        {{ 'water' | translate }}
+      </button>
+    </div>
+  </header>
+
+  <div
+    class="relative flex min-h-[300px] flex-1 flex-col overflow-hidden rounded-2xl bg-brand-surface border border-brand-border shadow-xl"
+  >
+     <p class="map-api-hint" *ngIf="loadError()">{{ 'mapLoadError' | translate }}</p>
+     <app-map
+      class="flex min-h-0 flex-1 flex-col"
+      [markers]="filteredMarkers()"
+      [focusMarkerId]="focusReportId()"
+      [mapContainerClass]="mapContainerClass"
+    />  
+
+    <a
+      class="absolute bottom-[max(12px,env(safe-area-inset-bottom,0px))] right-[max(12px,env(safe-area-inset-right,0px))] z-[1100] inline-flex size-[52px] items-center justify-center rounded-full bg-brand-primary text-white no-underline shadow-lg shadow-brand-primary/30 transition-all duration-150 ease-out hover:-translate-y-px hover:brightness-105 active:translate-y-0"
+      [routerLink]="['/authority/report', primaryReportId()]"
+      aria-label="تفاصيل البلاغ والعمال"
+    >
+      <span class="-mt-0.5 text-[30px] font-bold leading-none">+</span>
+    </a>
+  </div>
+</section>

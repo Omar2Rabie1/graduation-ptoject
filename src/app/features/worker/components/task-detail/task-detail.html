@@ -1,0 +1,115 @@
+<div class="bg-brand-surface glass-panel border border-brand-border rounded-2xl p-6 text-brand-text h-full flex flex-col">
+
+  <!-- Bottom Header -->
+  <div class="flex items-center justify-between mb-6">
+    <h2 class="text-lg font-semibold text-brand-text-primary">{{ 'currentTask' | translate }}</h2>
+    <div class="flex items-center gap-4 text-brand-muted text-sm">
+      <fa-icon [icon]="['fas', 'sun']"></fa-icon>
+      <fa-icon [icon]="['fas', 'bell']"></fa-icon>
+    </div>
+  </div>
+
+  <!-- Main Card -->
+  <div class="bg-brand-surface-light border border-brand-border rounded-xl overflow-hidden">
+
+    <!-- Header Row -->
+   <div class="p-6 border-b border-brand-border">
+
+      <div class="flex items-center gap-3 mb-3">
+
+        <!-- ID -->
+        <span class="text-xs px-2 py-1 bg-brand-bg border border-brand-border text-brand-muted rounded font-mono">
+          #{{ task.id }}
+        </span>
+
+        <!-- Priority (تم تعديل الكلاسات عشان تشتغل مضمون) -->
+        <span class="text-xs px-3 py-1 rounded-full font-semibold uppercase tracking-wide"
+              [ngClass]="{
+                'bg-[var(--badge-priority-bg)] text-[var(--badge-priority-text)]': task.priority === 'High',
+                'bg-yellow-500/10 text-yellow-500': task.priority === 'Medium',
+                'bg-green-500/10 text-green-500': task.priority === 'Low'
+              }">
+          <fa-icon [icon]="['fas', 'fire']" class="me-1"></fa-icon> {{ (task.priority.toLowerCase() + 'Priority') | translate }}
+        </span>
+
+        <!-- Status -->
+        <span class="text-xs px-3 py-1 bg-[var(--badge-assigned-bg)] text-[var(--badge-assigned-text)] rounded-full font-semibold uppercase tracking-wide">
+          {{ task.status | translate }}
+        </span>
+
+      </div>
+
+      <!-- Title -->
+      <h1 class="text-2xl font-bold mb-5 text-brand-text-primary">{{ task.title | translate }}</h1>
+
+      <!-- PHOTOS -->
+      <div class="grid grid-cols-3 gap-3">
+        <div *ngFor="let photo of task.photos"
+             class="h-[110px] rounded-lg overflow-hidden border border-brand-border hover:border-brand-primary transition-all bg-brand-bg">
+             <!-- لو الصور مش هتظهر هيظهر مكانها بوكس رمادي -->
+          <img [src]="photo" class="w-full h-full object-cover" alt="Task photo">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- Body -->
+    <div class="flex ">
+
+      <!-- LEFT SIDE -->
+      <div class="flex-1 p-6">
+        <h3 class="text-brand-muted text-sm font-semibold mb-3">{{ 'description' | translate }}</h3>
+        <p class="text-brand-muted leading-relaxed text-sm">{{ task.description | translate }}</p>
+      </div>
+
+      <!-- RIGHT SIDE -->
+      <div class="w-[280px] border-l border-brand-border p-6 text-sm bg-brand-bg">
+
+        <!-- Location -->
+        <div class="mb-6">
+          <p class="text-brand-muted text-xs mb-1 uppercase">{{ 'location' | translate }}</p>
+          <div class="flex items-center justify-between border border-brand-border rounded-lg px-3 py-2 bg-brand-surface-light">
+            <span class="text-brand-text-primary text-sm">{{ task.location | translate }}</span>
+            <fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary"></fa-icon>
+          </div>
+          <button class="mt-2 w-full border border-brand-border rounded-lg py-2 text-xs text-brand-muted hover:bg-brand-surface">
+            {{ 'openGoogleMaps' | translate }}
+          </button>
+        </div>
+
+        <!-- Assigned -->
+        <div class="mb-4">
+          <p class="text-brand-muted text-xs uppercase">{{ 'assignedBy' | translate }}</p>
+          <p class="text-brand-text-primary font-medium">{{ task.assignedTo }}</p>
+        </div>
+
+        <!-- Reporter -->
+        <div>
+          <p class="text-brand-muted text-xs uppercase">{{ 'reportedBy' | translate }}</p>
+          <p class="text-brand-text-primary font-medium">{{ task.reporter }}</p>
+        </div>
+
+      </div>
+
+    </div>
+
+    <!-- Bottom -->
+     <div class="border-t border-brand-border p-6 bg-brand-bg">
+      <h3 class="text-brand-muted text-sm font-semibold mb-3">{{ 'taskResolution' | translate }}</h3>
+      <textarea
+        class="w-full bg-brand-surface-light border border-brand-border rounded-lg p-3 text-sm text-brand-text-primary focus:outline-none focus:border-brand-primary resize-none placeholder-brand-muted"
+        rows="3"
+        [placeholder]="'describeFix' | translate">
+      </textarea>
+      <div class="flex justify-end mt-4 gap-4">
+        <button class="px-4 py-2 rounded-lg bg-red-500/10 text-red-400 border border-red-500/20">
+          {{ 'blocked' | translate }}
+        </button>
+        <button class="px-5 py-2 rounded-lg bg-brand-primary hover:bg-brand-primary-hover text-white font-semibold transition-colors">
+          {{ 'markAsFixed' | translate }}
+        </button>
+      </div>
+    </div>
+
+  </div>
+</div>

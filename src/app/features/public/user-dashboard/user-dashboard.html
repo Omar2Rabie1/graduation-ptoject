@@ -1,0 +1,267 @@
+<div class="flex h-screen w-full overflow-hidden bg-brand-bg text-brand-text font-sans antialiased relative">
+  
+  <!-- Sidebar Backdrop overlay for mobile/tablet screens -->
+  <div
+    *ngIf="isSidebarOpen"
+    (click)="toggleSidebar()"
+    class="fixed inset-0 z-[1050] bg-black/45 lg:hidden"
+  ></div>
+
+  <!-- Sidebar -->
+  <aside 
+    class="fixed lg:static inset-y-0 left-0 flex w-[260px] min-h-screen flex-col border-r border-brand-border bg-brand-surface px-4 py-5 text-brand-text z-[1100] shadow-2xl transition-transform duration-300"
+    [class.-translate-x-full]="!isSidebarOpen"
+    [class.translate-x-0]="isSidebarOpen"
+  >
+    <div class="mb-6 flex items-center gap-3 px-2">
+      <input type="file" #profileInput (change)="onProfilePicSelected($event)" accept="image/*" class="hidden">
+      <div (click)="profileInput.click()" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-orange-300 text-base font-semibold cursor-pointer overflow-hidden border border-brand-border transition-all text-white shadow-md">
+        <img *ngIf="profilePicPreview" [src]="profilePicPreview" class="w-full h-full object-cover">
+        <span *ngIf="!profilePicPreview" class="text-xl font-black">{{ userInitial }}</span>
+      </div>
+      <div class="flex flex-col gap-0.5">
+        <div class="text-[0.95rem] font-semibold text-brand-text-primary">{{ userName }}</div>
+        <div class="text-xs text-brand-muted">{{ 'publicUser' | translate }}</div>
+      </div>
+    </div>
+
+    <nav class="flex flex-col gap-[0.35rem] text-[0.9rem]">
+      <button (click)="setView('map')" [class.bg-brand-surface-light]="currentView === 'map'" [class.text-brand-primary]="currentView === 'map'" [class.border-brand-primary]="currentView === 'map'" [class.border-r-2]="currentView === 'map'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+        <span class="size-2 shrink-0 rounded-full bg-green-500"></span>
+        {{ 'reportIssue' | translate }}
+      </button>
+
+      <button (click)="setView('reports')" [class.bg-brand-surface-light]="currentView === 'reports'" [class.text-brand-primary]="currentView === 'reports'" [class.border-brand-primary]="currentView === 'reports'" [class.border-r-2]="currentView === 'reports'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+        <span class="size-2 shrink-0 rounded-full bg-brand-primary"></span>
+        {{ 'myReports' | translate }}
+      </button>
+
+      <button (click)="goToProfile()" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+        <span class="size-2 shrink-0 rounded-full bg-blue-500"></span>
+        {{ 'myProfile' | translate }}
+      </button>
+    </nav>
+
+    <div class="mt-auto border-t border-brand-border pt-5 space-y-2">
+      <button (click)="onLogout()" class="w-full cursor-pointer rounded-full border border-brand-border bg-brand-surface-light px-3 py-2.5 text-sm text-brand-muted transition-all duration-150 ease-out hover:-translate-y-px hover:bg-brand-border hover:text-white">
+        {{ 'logout' | translate }}
+      </button>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main class="relative flex-1 flex flex-col overflow-hidden">
+    <!-- Top Navbar -->
+    <header class="sticky top-0 z-[1001] flex h-16 shrink-0 items-center justify-between border-b border-brand-border bg-brand-surface px-8 text-brand-text">
+      <div class="flex items-center gap-3">
+        <button
+          (click)="toggleSidebar()"
+          class="lg:hidden flex flex-col items-center justify-center w-8 h-8 rounded-full border-0 bg-transparent text-inherit hover:bg-brand-surface-light cursor-pointer"
+          aria-label="Toggle Sidebar"
+        >
+          <span class="block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+          <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+          <span class="mt-[3px] block h-[1.8px] w-4 rounded-full bg-brand-muted"></span>
+        </button>
+        <div class="text-base font-semibold text-brand-text-primary">
+          {{ (currentView === 'map' ? 'reportIssue' : 'myReports') | translate }}
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <!-- Language Switcher -->
+        <button (click)="langService.toggle()" class="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-border bg-brand-surface-light text-brand-muted hover:text-brand-text-primary transition-all cursor-pointer" [attr.aria-label]="(langService.lang() === 'en' ? 'switchToArabic' : 'switchToEnglish') | translate">
+          <span class="text-xs font-bold">{{ langService.lang() === 'en' ? 'ع' : 'EN' }}</span>
+        </button>
+        <!-- Theme Switcher -->
+        <button (click)="toggleTheme()" class="flex h-9 w-9 items-center justify-center rounded-xl border border-brand-border bg-brand-surface-light text-brand-muted hover:text-brand-text-primary transition-all cursor-pointer" aria-label="Toggle Theme">
+          <fa-icon [icon]="(isDarkMode) ? ['fas', 'sun'] : ['fas', 'moon']"></fa-icon>
+        </button>
+      </div>
+    </header>
+
+    <!-- Wrapper for views so they layout correctly below the top navbar -->
+    <div class="flex-1 relative overflow-hidden flex flex-col">
+      <!-- Map View -->
+      <div [class.hidden]="currentView !== 'map'" class="absolute inset-0 w-full h-full flex flex-col p-4 min-[960px]:p-6 bg-brand-bg">
+      
+      <!-- Filters Header -->
+      <header class="flex flex-wrap items-center justify-start gap-4 text-brand-text mb-4 z-[1000]">
+        <div class="flex flex-wrap items-center gap-[0.35rem]">
+          <button
+            type="button"
+            (click)="clearFilters()"
+            class="cursor-pointer rounded-full border border-brand-border bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-brand-text transition-colors hover:bg-brand-surface-light hover:text-brand-text-primary"
+          >
+            {{ 'all' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="toggleType('Road Maintenance')"
+            class="cursor-pointer rounded-full border border-brand-primary/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-brand-primary transition-all hover:-translate-y-px hover:brightness-110"
+            [class.opacity-50]="!isTypeSelected('Road Maintenance') && typeFilter.size > 0"
+          >
+            {{ 'road' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="toggleType('Electrical Repair')"
+            class="cursor-pointer rounded-full border border-yellow-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-yellow-500 transition-all hover:-translate-y-px hover:brightness-110"
+            [class.opacity-50]="!isTypeSelected('Electrical Repair') && typeFilter.size > 0"
+          >
+            {{ 'electrical' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="toggleType('Water Leakage')"
+            class="cursor-pointer rounded-full border border-blue-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-blue-400 transition-all hover:-translate-y-px hover:brightness-110"
+            [class.opacity-50]="!isTypeSelected('Water Leakage') && typeFilter.size > 0"
+          >
+            {{ 'water' | translate }}
+          </button>
+          <button
+            type="button"
+            (click)="toggleType('Sanitation Issue')"
+            class="cursor-pointer rounded-full border border-green-500/50 bg-brand-surface px-[0.55rem] py-1 text-[0.8rem] text-green-400 transition-all hover:-translate-y-px hover:brightness-110"
+            [class.opacity-50]="!isTypeSelected('Sanitation Issue') && typeFilter.size > 0"
+          >
+            {{ 'sanitation' | translate }}
+          </button>
+        </div>
+      </header>
+
+      <div class="relative flex-1 w-full overflow-hidden rounded-2xl shadow-xl border border-brand-border bg-brand-surface glass-panel">
+        <app-map mapContainerClass="w-full h-full" class="block w-full h-full" [isUserMode]="true" [markers]="filteredMarkers" [focusMarkerId]="focusMarkerId" (locationSelected)="onLocationSelected($event)" (supportReport)="onSupportReport($event)"></app-map>
+        <button (click)="toggleReportPanel()" class="absolute bottom-[max(12px,env(safe-area-inset-bottom,0px))] right-[max(12px,env(safe-area-inset-right,0px))] z-[1100] inline-flex size-[52px] items-center justify-center rounded-full bg-brand-primary text-white shadow-lg shadow-brand-primary/30 transition-all duration-150 ease-out hover:-translate-y-px hover:brightness-105 active:translate-y-0">
+          <span class="-mt-0.5 text-[30px] font-bold leading-none text-white">+</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Reports History (Modified for Pagination) -->
+    <div *ngIf="currentView === 'reports'" class="flex-1 overflow-y-auto p-4 sm:p-6 md:p-8 lg:p-12 bg-brand-bg animate-fade-in relative z-10 flex flex-col">
+      <div class="space-y-6 flex-1">
+        <!-- Loop modified to use pagedReports -->
+        <div *ngFor="let report of pagedReports" class="glass-panel rounded-[24px] p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start gap-6 hover:bg-brand-surface transition-all">
+           <div class="flex-1 pr-0 md:pr-10 w-full">
+              <div class="flex items-center gap-4 mb-4">
+                  <span class="text-[10px] font-black text-brand-muted bg-brand-surface-light px-3 py-1 rounded-md">#{{report.id}}</span>
+                  <span [class]="report.statusBg" class="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ report.status | translate }}</span>
+              </div>
+              <h3 class="text-2xl sm:text-3xl font-bold mb-4 text-brand-text-primary">{{ report.title | translate }}</h3>
+              <p class="text-sm text-brand-muted leading-relaxed">{{ report.desc | translate }}</p>
+              <div class="mt-6 flex flex-wrap items-center gap-6">
+                  <span class="text-[11px] text-brand-muted font-bold uppercase tracking-widest"><fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary mr-2"></fa-icon> {{ report.location | translate }}</span>
+                  
+                  <div *ngIf="isResolved(report.status)" class="flex items-center gap-3">
+                    <button (click)="confirmFix(report.id)" class="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white text-xs font-bold rounded-xl border border-emerald-500/30 transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-950/20">
+                      <fa-icon [icon]="['fas', 'check']"></fa-icon> {{ 'confirmFix' | translate }}
+                    </button>
+                    <button (click)="rejectFix(report.id)" class="px-4 py-2 bg-rose-600/20 hover:bg-rose-600 text-rose-400 hover:text-white text-xs font-bold rounded-xl border border-rose-500/30 transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-rose-950/20">
+                      <fa-icon [icon]="['fas', 'xmark']"></fa-icon> {{ 'rejectFix' | translate }}
+                    </button>
+                  </div>
+              </div>
+           </div>
+           <div class="flex flex-wrap gap-4 w-full md:w-auto justify-start md:justify-end shrink-0">
+              <img *ngFor="let img of report.images" [src]="img" class="w-24 h-24 sm:w-32 sm:h-32 object-cover rounded-2xl border border-brand-border shadow-xl">
+           </div>
+        </div>
+      </div>
+
+      <!-- Pagination Controls UI -->
+      <div *ngIf="totalPages > 1" class="flex justify-center items-center gap-4 mt-12 mb-6">
+        <button (click)="goToPage(currentPage - 1)" 
+                [disabled]="currentPage === 1"
+                class="w-12 h-12 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed">
+          <fa-icon [icon]="['fas', 'chevron-left']" class="text-xs"></fa-icon>
+        </button>
+
+        <div class="flex gap-2">
+          <button *ngFor="let p of [].constructor(totalPages); let i = index"
+                  (click)="goToPage(i + 1)"
+                  [class.bg-brand-primary]="currentPage === i + 1"
+                  [class.border-brand-primary]="currentPage === i + 1"
+                  [class.text-white]="currentPage === i + 1"
+                  class="w-12 h-12 rounded-xl bg-brand-surface border border-brand-border text-[11px] font-bold transition-all hover:border-brand-primary hover:text-brand-primary">
+            {{ i + 1 }}
+          </button>
+        </div>
+
+        <button (click)="goToPage(currentPage + 1)" 
+                [disabled]="currentPage === totalPages"
+                class="w-12 h-12 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center hover:bg-brand-primary hover:text-white transition-all disabled:opacity-20 disabled:cursor-not-allowed">
+          <fa-icon [icon]="['fas', 'chevron-right']" class="text-xs"></fa-icon>
+        </button>
+      </div>
+    </div>
+  </div>
+  </main>
+
+  <!-- Submission Panel -->
+  <aside *ngIf="showReportPanel && currentView === 'map'" class="w-full sm:w-[480px] h-full bg-brand-surface glass-panel border-l border-brand-border p-6 sm:p-10 md:p-12 z-[2000] shadow-2xl animate-slide-in absolute right-0 overflow-y-auto">
+      <div class="flex justify-between items-center mb-12">
+        <h2 class="text-sm font-bold uppercase tracking-wider text-brand-text-primary">{{ 'submitNewReport' | translate }}</h2>
+        <button (click)="toggleReportPanel()" class="text-brand-muted hover:text-brand-text-primary transition-colors"><fa-icon [icon]="['fas', 'xmark']" class="text-xl"></fa-icon></button>
+      </div>
+
+      <div class="space-y-8">
+          <div>
+            <label class="text-xs text-brand-muted font-semibold mb-3 block">{{ 'evidencePhotos' | translate }}</label>
+            <input type="file" #fileInput accept="image/*" class="hidden">
+            <div class="flex gap-3 h-32">
+              <div *ngFor="let img of imagePreviews; let i = index" 
+                   (click)="!(isAiLoading && i === 0) && triggerFileInput(i)" 
+                   [class.pointer-events-none]="isAiLoading && i === 0"
+                   class="relative flex-1 bg-brand-bg border border-brand-border rounded-[16px] flex items-center justify-center cursor-pointer border-dashed overflow-hidden hover:border-brand-primary/50 transition-all">
+                <img *ngIf="img" [src]="img" class="w-full h-full object-cover" [class.opacity-40]="isAiLoading && i === 0">
+                <span *ngIf="!img && !(isAiLoading && i === 0)" class="text-2xl text-brand-primary font-bold">+</span>
+                
+                <!-- Loading overlay and spinner for slot 0 (first uploaded image) -->
+                <div *ngIf="isAiLoading && i === 0" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-2">
+                  <fa-icon [icon]="['fas', 'spinner']" [animation]="'spin'" class="text-2xl text-brand-primary mb-1"></fa-icon>
+                  <span class="text-[10px] font-semibold tracking-wide">Analyzing...</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-brand-muted font-semibold mb-3 block">{{ 'category' | translate }}</label>
+            <select #categorySelect class="w-full bg-brand-bg border border-brand-border p-4 rounded-xl text-sm text-brand-text-primary outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors">
+              <option value="Road Maintenance">{{ 'Road Maintenance' | translate }}</option>
+              <option value="Water Leakage">{{ 'Water Leakage' | translate }}</option>
+              <option value="Electrical Repair">{{ 'Electrical Repair' | translate }}</option>
+              <option value="Sanitation Issue">{{ 'Sanitation Issue' | translate }}</option>
+            </select>
+            <div *ngIf="aiConfidence !== null" class="mt-2 text-xs flex items-center gap-1.5 font-medium transition-all" [class.text-emerald-500]="aiConfidence >= 0.60" [class.text-rose-500]="aiConfidence < 0.60">
+              <fa-icon [icon]="(aiConfidence < 0.60) ? ['fas', 'circle-exclamation'] : ['fas', 'circle-check']"></fa-icon>
+              <span>
+                AI Confidence: {{ (aiConfidence * 100).toFixed(0) }}%
+                <span *ngIf="aiConfidence < 0.60" class="font-normal text-brand-muted"> (Low - please verify manually)</span>
+              </span>
+            </div>
+          </div>
+
+          <div>
+            <label class="text-xs text-brand-muted font-semibold mb-3 block">{{ 'description' | translate }}</label>
+            <textarea #descInput rows="4" class="w-full bg-brand-bg border border-brand-border p-4 rounded-xl text-sm text-brand-text-primary focus:border-brand-primary focus:ring-1 focus:ring-brand-primary outline-none resize-none transition-colors" [placeholder]="'whatIsIssue' | translate"></textarea>
+          </div>
+
+          <div>
+            <label class="text-xs text-brand-muted font-semibold mb-3 block">{{ 'location' | translate }}</label>
+            <div class="relative">
+              <input type="text" [(ngModel)]="locationInput" (keyup.enter)="updateMapLocation(descInput.value, categorySelect.value)" class="w-full bg-brand-bg border border-brand-border p-4 rounded-xl text-sm text-brand-text-primary outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary transition-colors" [placeholder]="'typeAreaName' | translate">
+              <span class="absolute right-4 top-4 text-brand-primary text-lg cursor-pointer hover:brightness-110" (click)="updateMapLocation(descInput.value, categorySelect.value)">
+                <fa-icon [icon]="['fas', 'magnifying-glass']"></fa-icon>
+              </span>
+            </div>
+          </div>
+
+          <button (click)="submitForm(descInput, categorySelect)" 
+                  [disabled]="!descInput.value || !locationInput"
+                  class="w-full mt-4 bg-brand-primary hover:bg-brand-primary-hover py-4 rounded-xl text-white font-bold text-sm uppercase tracking-wider transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-brand-primary/20">
+            {{ 'publishReport' | translate }}
+          </button>
+      </div>
+  </aside>
+</div>

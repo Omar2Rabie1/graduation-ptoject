@@ -1,0 +1,52 @@
+<aside [class]="asideHostClass">
+  <div class="mb-6 flex items-center gap-3">
+    <div
+      class="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-orange-300 text-base font-semibold text-white shadow-md"
+    >
+      <span>A</span>
+    </div>
+    <div class="flex flex-col gap-0.5">
+      <div class="text-[0.95rem] font-semibold text-brand-text-primary">Safwan</div>
+      <div class="text-xs text-brand-muted">{{ 'authorityRole' | translate }}</div>
+    </div>
+    <button
+      type="button"
+      class="ml-auto hidden size-8 items-center justify-center rounded-full border-0 bg-transparent text-inherit transition-[background,transform] duration-150 ease-out hover:bg-brand-surface-light max-lg:inline-flex"
+      (click)="toggleSidebar.emit()"
+      aria-label="Close sidebar"
+    >
+      <span>&times;</span>
+    </button>
+  </div>
+
+  <nav class="flex flex-col gap-[0.35rem] text-[0.9rem]">
+    <a
+      class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-[background,color] duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary"
+      routerLink="/authority/live-map"
+      routerLinkActive="bg-brand-surface-light text-brand-primary border-r-2 border-brand-primary"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span class="size-2 shrink-0 rounded-full bg-green-500"></span>
+      {{ 'liveMap' | translate }}
+    </a>
+    <a
+      class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-[background,color] duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary"
+      routerLink="/authority/reports"
+      routerLinkActive="bg-brand-surface-light text-brand-primary border-r-2 border-brand-primary"
+      [routerLinkActiveOptions]="{ exact: true }"
+    >
+      <span class="size-2 shrink-0 rounded-full bg-orange-500"></span>
+      {{ 'incomingReports' | translate }}
+    </a>
+  </nav>
+
+  <div class="mt-auto border-t border-brand-border pt-5">
+    <button
+      type="button"
+      class="w-full cursor-pointer rounded-full border border-brand-border bg-brand-surface-light px-3 py-2.5 text-sm text-brand-muted transition-[background,transform] duration-150 ease-out hover:-translate-y-px hover:bg-brand-border hover:text-brand-text-primary"
+      (click)="logout.emit()"
+    >
+      {{ 'logout' | translate }}
+    </button>
+  </div>
+</aside>

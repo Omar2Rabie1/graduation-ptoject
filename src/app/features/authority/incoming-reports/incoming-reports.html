@@ -1,0 +1,140 @@
+<section class="flex flex-col gap-5 text-brand-text animate-fade-in">
+  <header class="flex flex-wrap items-center justify-between gap-4 text-brand-text">
+    <div>
+      <h1 class="m-0 text-xl font-semibold">{{ 'incomingReports' | translate }}</h1>
+      <p class="mt-0.5 text-[0.9rem] text-brand-muted">
+        {{ 'incomingReportsSub' | translate }}
+      </p>
+    </div>
+
+    <div class="relative min-w-[220px]">
+      <fa-icon [icon]="['fas', 'magnifying-glass']" class="pointer-events-none absolute left-[11px] top-1/2 -translate-y-1/2 text-[0.8rem] text-brand-muted"
+      ></fa-icon>
+      <input
+        type="text"
+        class="w-full rounded-full border border-brand-border bg-brand-surface py-[0.55rem] pl-[2.1rem] pr-[0.9rem] text-[0.85rem] text-brand-text outline-none placeholder:text-brand-muted/70 focus:border-brand-primary focus:shadow-[0_0_0_1px_rgba(242,122,66,0.8)] transition-all"
+        [placeholder]="'searchReportsPlaceholder' | translate"
+        [(ngModel)]="search"
+      />
+    </div>
+  </header>
+
+  <div class="flex flex-col gap-5">
+    <article
+      class="grid grid-cols-1 lg:grid-cols-[minmax(0,3.5fr)_minmax(0,1.8fr)] gap-6 glass-panel rounded-2xl p-6 text-brand-text animate-slide-up"
+      *ngFor="let issue of filteredIssues"
+    >
+      <!-- Left Info Column -->
+      <div class="flex flex-col justify-between gap-4">
+        <div class="flex flex-col gap-2.5">
+          <!-- Tag & Status & Update Time -->
+          <div class="flex items-center justify-between gap-3 text-xs">
+            <div class="inline-flex gap-2">
+              <span
+                class="rounded bg-brand-surface-light border border-brand-border px-2.5 py-0.5 text-[0.7rem] font-mono tracking-wider"
+                >{{ issue.id }}</span
+              >
+              <span
+                class="rounded border px-2.5 py-0.5 text-[0.7rem] font-semibold uppercase tracking-wider"
+                [ngClass]="getStatusClass(issue.status)"
+                >{{ getStatusLabel(issue.status) | translate }}</span
+              >
+            </div>
+            <span class="text-brand-muted">{{ 'updated' | translate }} {{ issue.updatedAgo }}</span>
+          </div>
+
+          <!-- Title -->
+          <h2 class="m-0 mt-1.5 text-lg font-bold text-brand-text-primary">
+            {{ issue.title | translate }}
+          </h2>
+
+          <!-- Description -->
+          <p class="m-0 text-[0.85rem] leading-relaxed text-brand-muted">
+            {{ issue.description | translate }}
+          </p>
+
+          <!-- Location Bar -->
+          <div
+            class="flex items-center justify-between gap-4 rounded-xl border border-brand-border/60 bg-brand-bg/30 p-3 mt-2"
+          >
+            <div class="flex items-center gap-2.5 min-w-0">
+              <fa-icon [icon]="['fas', 'location-dot']" class="shrink-0 text-brand-primary"></fa-icon>
+              <span class="text-xs font-semibold text-brand-text truncate">{{ issue.location | translate }}</span>
+            </div>
+            <button
+              type="button"
+              class="cursor-pointer inline-flex items-center gap-1.5 rounded-lg border border-brand-border bg-brand-surface-light px-3 py-1.5 text-xs text-brand-text hover:bg-brand-border transition-colors shrink-0"
+              [routerLink]="['/authority/live-map']"
+              [queryParams]="{ reportId: reportIdForMap(issue.id) }"
+            >
+              <fa-icon [icon]="['far', 'map']"></fa-icon>
+              <span>{{ 'openMap' | translate }}</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Reporter Row & Assign Button -->
+        <div
+          class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-t border-brand-border/30 pt-3 mt-2"
+        >
+          <div class="flex items-center gap-3">
+            <div
+              class="inline-flex size-9 items-center justify-center rounded-full text-xs font-bold text-white shadow-md"
+              [style.background]="issue.reporterAvatarColor"
+            >
+              {{ issue.reporterName[0] }}
+            </div>
+            <div class="flex flex-col">
+              <span class="text-[0.65rem] text-brand-muted">{{ 'reportedByLabel' | translate }}</span>
+              <span class="text-[0.85rem] font-semibold text-brand-text-primary">{{ issue.reporterName }}</span>
+            </div>
+          </div>
+
+          <button
+            *ngIf="issue.status === 'submitted'"
+            type="button"
+            class="cursor-pointer rounded-full border-0 bg-brand-primary px-5 py-2.5 text-xs font-bold text-white shadow-lg shadow-brand-primary/20 hover:bg-brand-primary-hover transition-all active:translate-y-0"
+            (click)="openAssignWorker(issue)"
+          >
+            {{ 'assignWorker' | translate }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Right Photo Column -->
+      <aside
+        class="flex flex-col gap-3 rounded-[0.85rem] border border-brand-border/60 bg-brand-surface-light p-4 w-full"
+      >
+        <div class="text-[0.7rem] font-semibold uppercase tracking-[0.08em] text-brand-muted">
+          {{ 'attachedPhotos' | translate }} ({{ issue.images.length || 0 }})
+        </div>
+        
+        <!-- Empty State -->
+        <div *ngIf="!issue.images || issue.images.length === 0" 
+             class="flex flex-1 min-h-[160px] flex-col items-center justify-center rounded-xl border border-dashed border-brand-border/60 bg-brand-bg/15 p-4 text-center">
+          <fa-icon [icon]="['far', 'image']" class="text-xl text-brand-muted/30 mb-1.5"></fa-icon>
+          <span class="text-xs text-brand-muted/70">{{ 'noPhotosAttached' | translate }}</span>
+        </div>
+
+        <!-- Images Grid -->
+        <div *ngIf="issue.images && issue.images.length > 0" class="grid grid-cols-2 gap-2 flex-1">
+          <div *ngFor="let img of issue.images.slice(0, 4); let idx = index" class="relative aspect-square overflow-hidden rounded-lg border border-brand-border/40">
+            <img [src]="img" class="h-full w-full object-cover" alt="Site photo">
+            <!-- More Overlay -->
+            <div *ngIf="idx === 3 && issue.images.length > 4" 
+                 class="absolute inset-0 flex items-center justify-center bg-black/70 text-xs font-bold text-white">
+              +{{ issue.images.length - 3 }} {{ 'more' | translate }}
+            </div>
+          </div>
+        </div>
+      </aside>
+    </article>
+  </div>
+</section>
+
+<!-- Select Worker Component -->
+<app-selected-worker
+  [issue]="selectedIssue"
+  (close)="closeSelectedWorker()"
+  (assigned)="handleAssigned($event)"
+></app-selected-worker>

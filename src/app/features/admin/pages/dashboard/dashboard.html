@@ -1,0 +1,371 @@
+<!-- src/app/features/admin/pages/dashboard/dashboard.html -->
+<div class="min-h-screen w-full text-brand-text bg-brand-bg p-6 md:p-8 overflow-y-auto animate-fade-in custom-scrollbar">
+  
+  <!-- Loading Spinner -->
+  <div *ngIf="isLoading" class="fixed inset-0 z-50 flex flex-col items-center justify-center bg-brand-bg/80 backdrop-blur-sm">
+    <div class="relative w-16 h-16">
+      <div class="absolute inset-0 rounded-full border-4 border-brand-border"></div>
+      <div class="absolute inset-0 rounded-full border-4 border-t-brand-primary animate-spin"></div>
+    </div>
+    <p class="text-brand-muted text-sm mt-4 tracking-wider animate-pulse-slow">{{ 'loadingRealtimeData' | translate }}</p>
+  </div>
+
+  <div *ngIf="!isLoading" class="flex flex-col gap-6 md:gap-8 max-w-7xl mx-auto">
+    
+    <!-- Top Header -->
+    <header class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-brand-border/60 pb-6">
+      <div>
+        <h1 class="text-3xl font-extrabold text-white tracking-tight">{{ 'systemStatusOverview' | translate }}</h1>
+        <p class="text-brand-muted text-sm mt-1">{{ 'realtimeIndicatorsSub' | translate }}</p>
+      </div>
+
+      <!-- Time range toggle -->
+      <div class="flex bg-brand-surface border border-brand-border rounded-xl p-1 shadow-inner self-start sm:self-center">
+        <button (click)="changeTimeFilter('today')" 
+                [class]="timeFilter === 'today' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-brand-muted hover:text-white'" 
+                class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-300">
+          {{ 'today' | translate }}
+        </button>
+        <button (click)="changeTimeFilter('7days')" 
+                [class]="timeFilter === '7days' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-brand-muted hover:text-white'" 
+                class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-300">
+          {{ 'days7' | translate }}
+        </button>
+        <button (click)="changeTimeFilter('30days')" 
+                [class]="timeFilter === '30days' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-brand-muted hover:text-white'" 
+                class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-300">
+          {{ 'days30' | translate }}
+        </button>
+        <button (click)="changeTimeFilter('all')" 
+                [class]="timeFilter === 'all' ? 'bg-brand-primary text-white shadow-lg shadow-brand-primary/20' : 'text-brand-muted hover:text-white'" 
+                class="px-3.5 py-2 rounded-lg text-xs font-semibold transition-all duration-300">
+          {{ 'allTime' | translate }}
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats Grid -->
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+      
+      <!-- Card 1: Users -->
+      <div class="glass-panel rounded-2xl p-6 flex items-center justify-between hover:border-brand-primary/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-brand-primary/5 rounded-full blur-2xl group-hover:bg-brand-primary/10 transition-colors"></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-brand-muted font-bold tracking-wider uppercase">{{ 'totalRegisteredUsers' | translate }}</p>
+          <h3 class="text-3xl font-extrabold text-white mt-1">{{ stats.totalUsers }}</h3>
+          <span class="text-[10px] flex items-center gap-1 font-semibold text-emerald-400 mt-2">
+            <fa-icon [icon]="['fas', 'arrow-trend-up']"></fa-icon> +{{ stats.userTrend }}% {{ 'fromPreviousPeriod' | translate }}
+          </span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-brand-primary/10 border border-brand-primary/20 flex items-center justify-center text-brand-primary group-hover:scale-110 transition-transform">
+          <fa-icon [icon]="['fas', 'users']" class="text-xl"></fa-icon>
+        </div>
+      </div>
+
+      <!-- Card 2: Workers -->
+      <div class="glass-panel rounded-2xl p-6 flex items-center justify-between hover:border-emerald-500/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-emerald-500/5 rounded-full blur-2xl group-hover:bg-emerald-500/10 transition-colors"></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-brand-muted font-bold tracking-wider uppercase">{{ 'activeInFieldWorkers' | translate }}</p>
+          <h3 class="text-3xl font-extrabold text-white mt-1">{{ stats.activeWorkers }}</h3>
+          <span class="text-[10px] flex items-center gap-1 font-semibold text-emerald-400 mt-2">
+            <fa-icon [icon]="['fas', 'arrow-trend-up']"></fa-icon> +{{ stats.workerTrend }}% {{ 'activeNow' | translate }}
+          </span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 group-hover:scale-110 transition-transform">
+          <fa-icon [icon]="['fas', 'hard-hat']" class="text-xl"></fa-icon>
+        </div>
+      </div>
+
+      <!-- Card 3: Open Issues -->
+      <div class="glass-panel rounded-2xl p-6 flex items-center justify-between hover:border-amber-500/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-amber-500/5 rounded-full blur-2xl group-hover:bg-amber-500/10 transition-colors"></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-brand-muted font-bold tracking-wider uppercase">{{ 'pendingOpenIssues' | translate }}</p>
+          <h3 class="text-3xl font-extrabold text-white mt-1">{{ stats.openIssues }}</h3>
+          <span class="text-[10px] flex items-center gap-1 font-semibold text-sky-400 mt-2">
+            <fa-icon [icon]="['fas', 'arrow-trend-down']"></fa-icon> {{ stats.issueTrend }}% {{ 'queueReduction' | translate }}
+          </span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 group-hover:scale-110 transition-transform">
+          <fa-icon [icon]="['fas', 'triangle-exclamation']" class="text-xl"></fa-icon>
+        </div>
+      </div>
+
+      <!-- Card 4: Resolved Issues -->
+      <div class="glass-panel rounded-2xl p-6 flex items-center justify-between hover:border-indigo-500/40 hover:-translate-y-1 transition-all duration-300 group cursor-pointer relative overflow-hidden">
+        <div class="absolute -right-6 -bottom-6 w-24 h-24 bg-indigo-500/5 rounded-full blur-2xl group-hover:bg-indigo-500/10 transition-colors"></div>
+        <div class="flex flex-col gap-1">
+          <p class="text-xs text-brand-muted font-bold tracking-wider uppercase">{{ 'resolvedInfrastructureIssues' | translate }}</p>
+          <h3 class="text-3xl font-extrabold text-white mt-1">{{ stats.resolvedIssues }}</h3>
+          <span class="text-[10px] flex items-center gap-1 font-semibold text-emerald-400 mt-2">
+            <fa-icon [icon]="['fas', 'arrow-trend-up']"></fa-icon> +{{ stats.resolvedTrend }}% {{ 'solutionSpeed' | translate }}
+          </span>
+        </div>
+        <div class="w-12 h-12 rounded-xl bg-indigo-500/10 border border-indigo-500/20 flex items-center justify-center text-indigo-400 group-hover:scale-110 transition-transform">
+          <fa-icon [icon]="['fas', 'check-circle']" class="text-xl"></fa-icon>
+        </div>
+      </div>
+
+    </section>
+
+    <!-- Main Charts Section -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Trend Area Chart (Left 2 Columns) -->
+      <div class="lg:col-span-2 glass-panel rounded-2xl p-6 flex flex-col relative overflow-hidden">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <h3 class="text-lg font-bold text-white">{{ 'issuesTrafficSolutions' | translate }}</h3>
+            <p class="text-brand-muted text-xs">{{ 'comparisonReportedResolved' | translate }}</p>
+          </div>
+          
+          <!-- Legend -->
+          <div class="flex items-center gap-4 text-xs font-semibold">
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-brand-primary"></span> {{ 'reportedTitle' | translate }}</span>
+            <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span> {{ 'resolvedTitle' | translate }}</span>
+          </div>
+        </div>
+
+        <!-- SVG Line Chart Wrapper -->
+        <div class="relative w-full h-[220px]" (mousemove)="onChartMouseMove($event)" (mouseleave)="onChartMouseLeave()">
+          
+          <!-- SVG Container -->
+          <svg class="w-full h-full overflow-visible" preserveAspectRatio="none" viewBox="0 0 600 200">
+            <defs>
+              <!-- Gradients for fill areas -->
+              <linearGradient id="reportedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#F27A42" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#F27A42" stop-opacity="0.0"/>
+              </linearGradient>
+              <linearGradient id="resolvedGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#10b981" stop-opacity="0.3"/>
+                <stop offset="100%" stop-color="#10b981" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+
+            <!-- SVG Grid Lines -->
+            <line x1="40" y1="25" x2="560" y2="25" stroke="#162436" stroke-width="1" />
+            <line x1="40" y1="75" x2="560" y2="75" stroke="#162436" stroke-width="1" />
+            <line x1="40" y1="125" x2="560" y2="125" stroke="#162436" stroke-width="1" />
+            <line x1="40" y1="175" x2="560" y2="175" stroke="#162436" stroke-width="1.5" />
+
+            <!-- Y Axis Axis labels -->
+            <text x="15" y="30" fill="#8ea4bf" font-size="9" font-family="sans-serif">{{ maxChartValue }}</text>
+            <text x="15" y="105" fill="#8ea4bf" font-size="9" font-family="sans-serif">{{ Math.round(maxChartValue / 2) }}</text>
+            <text x="15" y="180" fill="#8ea4bf" font-size="9" font-family="sans-serif">0</text>
+
+            <!-- Chart Areas -->
+            <path [attr.d]="reportedAreaPath" fill="url(#reportedGrad)" class="transition-all duration-500" />
+            <path [attr.d]="resolvedAreaPath" fill="url(#resolvedGrad)" class="transition-all duration-500" />
+
+            <!-- Chart Lines -->
+            <path [attr.d]="reportedPath" fill="none" stroke="#F27A42" stroke-width="3" stroke-linecap="round" class="transition-all duration-500" />
+            <path [attr.d]="resolvedPath" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" class="transition-all duration-500" />
+
+            <!-- Interactive elements (Circles on points & hover indicators) -->
+            <g *ngFor="let p of chartPoints; let idx = index">
+              <!-- Grid vertical dotted line on hover -->
+              <line *ngIf="hoveredIndex === idx" [attr.x1]="p.x" [attr.y1]="25" [attr.x2]="p.x" [attr.y2]="175" stroke="#F27A42" stroke-width="1" stroke-dasharray="3,3" />
+
+              <!-- Static points -->
+              <circle [attr.cx]="p.x" [attr.cy]="p.yReported" r="4" fill="#030813" stroke="#F27A42" stroke-width="2" class="cursor-pointer" />
+              <circle [attr.cx]="p.x" [attr.cy]="p.yResolved" r="4" fill="#030813" stroke="#10b981" stroke-width="2" class="cursor-pointer" />
+
+              <!-- Outer glowing circles on hover -->
+              <circle *ngIf="hoveredIndex === idx" [attr.cx]="p.x" [attr.cy]="p.yReported" r="8" fill="#F27A42" fill-opacity="0.3" />
+              <circle *ngIf="hoveredIndex === idx" [attr.cx]="p.x" [attr.y]="p.yResolved" r="8" fill="#10b981" fill-opacity="0.3" />
+
+              <!-- X Labels -->
+              <text [attr.x]="p.x" y="195" fill="#8ea4bf" font-size="9" text-anchor="middle" font-family="sans-serif">{{ p.label }}</text>
+            </g>
+          </svg>
+
+          <!-- Floating Interactive Tooltip -->
+          <div *ngIf="hoveredPoint" 
+               class="absolute z-10 bg-brand-surface border border-brand-border rounded-xl p-3 shadow-2xl pointer-events-none text-xs transition-all duration-100 ease-out"
+               [style.left.px]="hoveredX - 60" 
+               [style.top.px]="hoveredY - 85">
+            <div class="font-bold text-white border-b border-brand-border/60 pb-1 mb-1.5">{{ hoveredPoint.label }}</div>
+            <div class="flex flex-col gap-1">
+              <span class="flex items-center gap-1.5 text-brand-muted">
+                <span class="w-2 h-2 rounded-full bg-brand-primary"></span> {{ 'reportedTitle' | translate }}: 
+                <strong class="text-white">{{ hoveredPoint.reported }}</strong>
+              </span>
+              <span class="flex items-center gap-1.5 text-brand-muted">
+                <span class="w-2 h-2 rounded-full bg-emerald-500"></span> {{ 'resolvedTitle' | translate }}: 
+                <strong class="text-white">{{ hoveredPoint.resolved }}</strong>
+              </span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- Categories & User roles (Right Column) -->
+      <div class="glass-panel rounded-2xl p-6 flex flex-col justify-between">
+        <div>
+          <h3 class="text-lg font-bold text-white">{{ 'issueCategories' | translate }}</h3>
+          <p class="text-brand-muted text-xs mb-6">{{ 'distributionSystemReports' | translate }}</p>
+        </div>
+
+        <!-- Donut & Breakdown Grid -->
+        <div class="flex flex-col items-center sm:flex-row lg:flex-col gap-6 justify-center">
+          
+          <!-- SVG Donut Chart -->
+          <div class="relative flex items-center justify-center">
+            <svg viewBox="0 0 100 100" class="w-28 h-28 transform -rotate-90">
+              <circle cx="50" cy="50" r="40" fill="transparent" stroke="#162436" stroke-width="8" />
+              <circle *ngFor="let seg of donutSegments"
+                      cx="50" cy="50" r="40"
+                      fill="transparent"
+                      [attr.stroke]="seg.color"
+                      stroke-width="10"
+                      [attr.stroke-dasharray]="donutCircumference"
+                      [attr.stroke-dashoffset]="seg.offset"
+                      [style.transform]="'rotate(' + seg.rotation + 'deg)'"
+                      style="transform-origin: center; transition: all 0.6s cubic-bezier(0.1, 0.8, 0.2, 1);" />
+            </svg>
+            <div class="absolute flex flex-col items-center">
+              <span class="text-xl font-black text-white">{{ stats.openIssues + stats.resolvedIssues }}</span>
+              <span class="text-[9px] text-brand-muted font-bold uppercase tracking-wider">{{ 'tickets' | translate }}</span>
+            </div>
+          </div>
+
+          <!-- Vertical Legend / Progress Bars -->
+          <div class="flex-1 w-full flex flex-col gap-3">
+            <div *ngFor="let cat of categories.slice(0, 4)" class="flex flex-col gap-1">
+              <div class="flex justify-between items-center text-xs">
+                <span class="flex items-center gap-1.5 text-brand-text font-medium">
+                  <span class="w-2 h-2 rounded-full" [style.background-color]="cat.color"></span>
+                  {{ cat.name | translate }}
+                </span>
+                <span class="text-brand-muted text-[11px] font-bold">{{ cat.count }} ({{ cat.percent }}%)</span>
+              </div>
+              <div class="w-full h-1.5 bg-brand-surface border border-brand-border rounded-full overflow-hidden">
+                <div class="h-full rounded-full transition-all duration-1000" 
+                     [style.width.%]="cat.percent" 
+                     [style.background-color]="cat.color"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </section>
+
+    <!-- Bottom Lists Section: Live Reports & Recent Audits -->
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      
+      <!-- Live Reports Table (Left 2 Columns) -->
+      <div class="lg:col-span-2 glass-panel rounded-2xl p-6 flex flex-col h-[350px]">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="text-lg font-bold text-white">{{ 'liveIssuesTracker' | translate }}</h3>
+            <p class="text-brand-muted text-xs">{{ 'reviewRecentReports' | translate }}</p>
+          </div>
+          <!-- Quick search -->
+          <div class="relative">
+            <input type="text" 
+                   [(ngModel)]="searchQuery" 
+                   [placeholder]="'searchIssues' | translate"
+                   class="h-[32px] w-full sm:w-[200px] bg-brand-surface border border-brand-border text-xs rounded-xl px-3 pl-8 text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-primary transition-colors" />
+            <fa-icon [icon]="['fas', 'magnifying-glass']" class="absolute left-3 top-2.5 text-brand-muted text-[10px]"></fa-icon>
+          </div>
+        </div>
+
+        <!-- Table Container -->
+        <div class="flex-1 overflow-auto custom-scrollbar">
+          <table class="w-full min-w-[600px] text-left text-xs border-collapse">
+            <thead>
+              <tr class="text-brand-muted uppercase text-[10px] font-bold border-b border-brand-border sticky top-0 bg-[#060f1c] z-10">
+                <th class="pb-3 pr-2">{{ 'idTitle' | translate }}</th>
+                <th class="pb-3 pr-2">{{ 'category' | translate }}</th>
+                <th class="pb-3 pr-2">{{ 'reporter' | translate }}</th>
+                <th class="pb-3 pr-2">{{ 'priority' | translate }}</th>
+                <th class="pb-3 pr-2">{{ 'status' | translate }}</th>
+                <th class="pb-3 text-right">{{ 'actionTitle' | translate }}</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rep of filteredReports" class="border-b border-brand-border/40 hover:bg-brand-surface-light/30 transition-colors">
+                <td class="py-3 font-semibold text-brand-primary pr-2">{{ rep.id }}</td>
+                <td class="py-3 text-white pr-2">{{ rep.category | translate }}</td>
+                <td class="py-3 text-brand-text pr-2">{{ rep.reporter }}</td>
+                <td class="py-3 pr-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold"
+                        [ngClass]="rep.priority === 'High' ? 'bg-red-500/10 text-red-400 border border-red-500/20' : 'bg-brand-primary/10 text-brand-primary border border-brand-primary/20'">
+                    {{ rep.priority | translate }}
+                  </span>
+                </td>
+                <td class="py-3 pr-2">
+                  <span class="px-2 py-0.5 rounded text-[10px] font-semibold"
+                        [ngClass]="rep.status === 'Resolved' ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20' : 
+                                  rep.status === 'In Progress' ? 'bg-sky-500/10 text-sky-400 border border-sky-500/20' : 
+                                  'bg-amber-500/10 text-amber-400 border border-amber-500/20'">
+                    {{ rep.status | translate }}
+                  </span>
+                </td>
+                <td class="py-3 text-right">
+                  <button *ngIf="rep.status !== 'Resolved'"
+                          (click)="quickAssignWorker(rep.id)"
+                          class="bg-brand-primary/10 hover:bg-brand-primary hover:text-white border border-brand-primary/30 text-brand-primary px-3 py-1 rounded-lg font-bold text-[10px] transition-all">
+                    {{ 'assign' | translate }}
+                  </button>
+                  <span *ngIf="rep.status === 'Resolved'" class="text-brand-muted italic font-medium">{{ 'assigned' | translate }}</span>
+                </td>
+              </tr>
+              <tr *ngIf="filteredReports.length === 0">
+                <td colspan="6" class="py-6 text-center text-brand-muted">{{ 'noMatchingIssues' | translate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Recent System Logs (Right Column) -->
+      <div class="glass-panel rounded-2xl p-6 flex flex-col h-[350px]">
+        <div class="flex flex-col gap-2 mb-4">
+          <h3 class="text-lg font-bold text-white">{{ 'systemActionsLog' | translate }}</h3>
+          <!-- Quick search logs -->
+          <div class="relative">
+            <input type="text" 
+                   [(ngModel)]="logSearchQuery" 
+                   [placeholder]="'searchAuditTrail' | translate"
+                   class="h-[32px] w-full bg-brand-surface border border-brand-border text-xs rounded-xl px-3 pl-8 text-brand-text placeholder-brand-muted focus:outline-none focus:border-brand-primary transition-colors" />
+            <fa-icon [icon]="['fas', 'magnifying-glass']" class="absolute left-3 top-2.5 text-brand-muted text-[10px]"></fa-icon>
+          </div>
+        </div>
+
+        <!-- Log timeline list -->
+        <div class="flex-1 overflow-y-auto custom-scrollbar flex flex-col gap-4">
+          <div *ngFor="let log of filteredLogs" class="flex gap-3 text-xs border-b border-brand-border/40 pb-3">
+            
+            <!-- Indicator Icon -->
+            <div class="flex-shrink-0 w-8 h-8 rounded-xl bg-brand-surface border border-brand-border flex items-center justify-center"
+                 [ngClass]="log.result === 'Success' ? 'text-emerald-400' : 'text-amber-400'">
+              <fa-icon [icon]="log.result === 'Success' ? ['fas', 'check'] : ['fas', 'triangle-exclamation']"></fa-icon>
+            </div>
+
+            <!-- Content -->
+            <div class="flex-1 flex flex-col gap-0.5">
+              <div class="flex justify-between">
+                <span class="font-bold text-white">{{ log.action | translate }}</span>
+                <span class="text-[9px] text-brand-muted font-semibold">{{ log.timestamp.split(' ')[1] || log.timestamp }}</span>
+              </div>
+              <p class="text-brand-muted text-[11px] font-medium mt-0.5">
+                by <span class="text-brand-text font-bold">{{ log.actor }}</span> ({{ log.actorRole | translate }})
+              </p>
+              <p class="text-[10px] text-brand-muted italic mt-0.5">Target: {{ log.target | translate }}</p>
+            </div>
+
+          </div>
+          <div *ngIf="filteredLogs.length === 0" class="py-6 text-center text-brand-muted text-xs">{{ 'noMatchingSystemLogs' | translate }}</div>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+</div>

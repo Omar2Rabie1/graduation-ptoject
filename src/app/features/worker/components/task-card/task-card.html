@@ -1,0 +1,68 @@
+<div
+  class="bg-brand-surface border border-brand-border glass-panel rounded-xl p-6 flex flex-col gap-6 lg:flex-row hover:border-brand-primary/50 transition-colors"
+>
+  <div class="flex-1 flex flex-col min-w-0">
+    <div class="flex flex-wrap justify-between items-center gap-3 mb-4">
+      <div class="flex gap-3 items-center">
+        <span class="bg-brand-bg px-3 py-1 text-xs text-brand-muted border border-brand-border rounded-md font-mono">
+          #{{ taskId }}
+        </span>
+        <span class="bg-[var(--badge-assigned-bg)] text-[var(--badge-assigned-text)] px-3 py-1 text-xs rounded-full font-semibold">
+          {{ statusLabel | translate }}
+        </span>
+      </div>
+    </div>
+
+    <h2 class="text-xl font-bold text-brand-text-primary mb-2">
+      {{ (task.category || 'Untitled Task') | translate }}
+    </h2>
+
+    <p class="text-sm text-brand-muted mb-2">by {{ task.reporterName }}<span *ngIf="task.location?.address"> - {{ task.location?.address | translate }}</span></p>
+<p class="text-brand-muted text-sm mb-4 leading-relaxed">
+      {{ (task.description || 'No description') | translate }}
+    </p>
+
+    @if (task.location?.address) {
+      <div class="flex items-center gap-2 text-sm text-brand-muted mb-4">
+        <fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary"></fa-icon>
+        <span>{{ task.location?.address | translate }}</span>
+      </div>
+    }
+
+    <div class="flex flex-wrap gap-3 mt-auto">
+      <button
+        type="button"
+        class="bg-[var(--btn-outline-bg)] border border-[var(--btn-outline-border)] px-6 py-2 rounded-lg text-brand-muted hover:bg-brand-surface-light hover:text-brand-text-primary transition-all disabled:opacity-50"
+        [disabled]="busy"
+        (click)="reject.emit()"
+      >
+        {{ 'reject' | translate }}
+      </button>
+      <button
+        type="button"
+        class="bg-brand-primary px-6 py-2 rounded-lg text-white hover:bg-brand-primary-hover transition-all font-medium disabled:opacity-50 shadow-md shadow-brand-primary/20"
+        [disabled]="busy"
+        (click)="accept.emit()"
+      >
+        @if (busy) {
+          <span class="inline-block size-4 animate-spin rounded-full border-2 border-white/30 border-t-white align-middle"></span>
+        } @else {
+          {{ 'accept' | translate }}
+        }
+      </button>
+    </div>
+  </div>
+
+  @if (task.images?.length) {
+    <div class="w-full lg:w-[200px] shrink-0">
+      <p class="text-sm mb-3 text-brand-muted font-medium">{{ 'attachedPhotos' | translate }}</p>
+      <div class="grid grid-cols-2 gap-2">
+        @for (img of task.images; track img) {
+          <div class="bg-brand-bg h-[80px] rounded-lg overflow-hidden border border-brand-border">
+            <img [src]="img" class="w-full h-full object-cover" alt="" />
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

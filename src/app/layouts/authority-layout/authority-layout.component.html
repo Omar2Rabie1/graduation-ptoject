@@ -1,0 +1,35 @@
+<div
+  class="flex h-screen overflow-hidden font-sans antialiased max-lg:relative bg-brand-bg text-brand-text"
+>
+  <!-- Sidebar Backdrop overlay for mobile/tablet screens -->
+  <div
+    *ngIf="isSidebarOpen"
+    class="fixed inset-0 z-[1050] bg-black/45 lg:hidden"
+    (click)="toggleSidebar()"
+  ></div>
+
+  <app-sidebar
+    [isSidebarOpen]="isSidebarOpen"
+    (toggleSidebar)="toggleSidebar()"
+    (logout)="logout()"
+  />
+
+  <div class="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden">
+    <app-navbar
+      [isDarkMode]="isDarkMode"
+      [title]="navbarTitle"
+      (toggleSidebar)="toggleSidebar()"
+      (toggleDarkMode)="toggleDarkMode()"
+    />
+
+    <main
+      class="flex min-h-0 flex-1 flex-col overflow-hidden p-4 lg:px-6 lg:py-5 bg-brand-bg"
+    >
+      <div
+        class="flex min-h-0 flex-1 flex-col overflow-hidden [&>router-outlet~*]:min-h-0 [&>router-outlet~*]:flex-1 [&>router-outlet~*]:overflow-auto [&>router-outlet~app-live-map]:flex [&>router-outlet~app-live-map]:flex-col [&>router-outlet~app-live-map]:overflow-hidden [&>router-outlet~app-report-details]:flex [&>router-outlet~app-report-details]:flex-col [&>router-outlet~app-report-details]:overflow-hidden"
+      >
+        <router-outlet />
+      </div>
+    </main>
+  </div>
+</div>

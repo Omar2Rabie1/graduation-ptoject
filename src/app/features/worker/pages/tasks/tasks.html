@@ -1,0 +1,51 @@
+<div class="flex min-h-full flex-col gap-6 text-brand-text animate-fade-in">
+  <header class="flex flex-wrap justify-between items-center gap-4">
+    <div>
+      <h1 class="text-xl font-semibold text-brand-text-primary">{{ 'myTasks' | translate }}</h1>
+      <p class="mt-1 text-sm text-brand-muted">{{ 'myTasksSub' | translate }}</p>
+    </div>
+    <div *ngIf="workerId" class="flex flex-col items-end gap-1.5">
+      <div class="flex items-center gap-2 bg-brand-surface border border-brand-border px-3 py-1.5 rounded-xl text-xs">
+        <span class="text-brand-muted uppercase font-bold text-[10px]">My Worker ID:</span>
+        <span class="text-brand-text-primary font-mono select-all">{{ workerId }}</span>
+        <button (click)="copyWorkerId()" class="text-brand-primary hover:text-brand-primary-hover border-0 bg-transparent cursor-pointer ml-1" title="Copy ID">
+          <fa-icon [icon]="['fas', 'clipboard-list']" class="text-xs"></fa-icon>
+        </button>
+      </div>
+      <div class="text-[11px] text-brand-muted pr-1">
+        {{ 'fullName' | translate }}: <span class="text-brand-text-primary font-semibold">{{ workerName }}</span>
+      </div>
+    </div>
+  </header>
+
+  <app-search-bar></app-search-bar>
+  <app-filters></app-filters>
+
+  @if (loading()) {
+    <div class="flex justify-center py-16">
+      <div class="size-10 animate-spin rounded-full border-2 border-brand-border border-t-brand-primary"></div>
+    </div>
+  }
+
+  @if (!loading() && error()) {
+    <div class="rounded-xl border border-red-500/30 bg-red-500/10 px-4 py-3 text-sm text-red-300">
+      {{ error() }}
+      <button type="button" class="ml-3 underline" (click)="loadTasks()">{{ 'retry' | translate }}</button>
+    </div>
+  }
+
+  @if (!loading() && !error() && tasks().length === 0) {
+    <p class="text-center text-sm text-brand-muted py-12">{{ 'noTasksAssigned' | translate }}</p>
+  }
+
+  <div class="space-y-6">
+    @for (task of tasks(); track task.id) {
+      <app-task-card
+        [task]="task"
+        [busy]="actionLoadingId() === reportIdFromTask(task)"
+        (accept)="onAccept(task)"
+        (reject)="onReject(task)"
+      />
+    }
+  </div>
+</div>
