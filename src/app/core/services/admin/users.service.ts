@@ -21,6 +21,7 @@ export interface CreateUserDto {
   password?: string;
   role: string;
   specialization?: string;
+  fullName?: string; // Added to match frontend model
 }
 
 export interface CreateUserResponse {

@@ -148,6 +148,7 @@ export class CreateUserPageComponent {
     // Mapping payload to match generic backend expectations if needed
     const payload: CreateUserDto = {
       name: this.user.fullName,
+      fullName: this.user.fullName,
       email: this.user.email,
       phoneNumber: this.user.phone,
       role: this.user.role,
@@ -187,4 +188,4 @@ export class CreateUserPageComponent {
       }
     });
   }
-}
+}
