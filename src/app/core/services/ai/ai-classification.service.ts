@@ -1,30 +1,39 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
-import { timeout, catchError } from 'rxjs/operators';
+import { timeout, catchError, map } from 'rxjs/operators';
+import { environment } from '../../../../environments/environment';
 
 export interface AiClassifyResponse {
   classification: string;
   description: string;
 }
 
+interface AISuggestionDto {
+  suggestedCategory: string;
+  suggestedDescription: string;
+}
+
 @Injectable({ providedIn: 'root' })
 export class AiClassificationService {
-  private readonly apiUrl =
-    'https://mostafa-abuhamed-irs-ai.hf.space/classify-image';
-  private readonly TIMEOUT_MS = 45_000;
+  private readonly apiUrl = `${environment.apiUrl.replace(/\/$/, '')}/public/report/analyze-image`;
+  private readonly TIMEOUT_MS = 60_000;
 
   constructor(private readonly http: HttpClient) {}
 
   classifyImages(files: File[]): Observable<AiClassifyResponse> {
     const form = new FormData();
     files.forEach(file => {
-      form.append('files', file);
+      form.append('images', file);
     });
     return this.http
-      .post<AiClassifyResponse>(this.apiUrl, form)
+      .post<AISuggestionDto>(this.apiUrl, form)
       .pipe(
         timeout(this.TIMEOUT_MS),
+        map(response => ({
+          classification: response.suggestedCategory,
+          description: response.suggestedDescription
+        })),
         catchError((err) => throwError(() => err))
       );
   }
