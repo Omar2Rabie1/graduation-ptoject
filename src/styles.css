@@ -174,3 +174,27 @@ span {
 ::-webkit-scrollbar-track { background: theme('colors.brand.bg'); }
 ::-webkit-scrollbar-thumb { background: theme('colors.brand.border'); border-radius: 3px; }
 ::-webkit-scrollbar-thumb:hover { background: theme('colors.brand.primary'); }
+
+/* Custom Leaflet Map Marker Styling */
+.map-custom-marker {
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
+}
+.map-custom-marker:hover {
+  transform: scale(1.2) !important;
+}
+
+@keyframes mapMarkerPulse {
+  0% {
+    box-shadow: 0 0 0 0 var(--pulse-color, rgba(220, 38, 38, 0.5)), 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+  70% {
+    box-shadow: 0 0 0 12px rgba(220, 38, 38, 0), 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(220, 38, 38, 0), 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.map-marker-focused {
+  animation: mapMarkerPulse 2s infinite;
+}

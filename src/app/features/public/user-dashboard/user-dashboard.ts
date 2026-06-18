@@ -170,6 +170,14 @@ export class UserDashboard implements OnInit {
     }
   }
 
+  removeSelectedFile(event: Event, index: number) {
+    event.stopPropagation();
+    this.selectedFiles[index] = null;
+    this.imagePreviews[index] = '';
+    this.cdr.detectChanges();
+  }
+
+
   private classifyAllSelectedImages(): void {
     const activeFiles = this.selectedFiles.filter((f): f is File => f !== null);
     if (activeFiles.length === 0) return;

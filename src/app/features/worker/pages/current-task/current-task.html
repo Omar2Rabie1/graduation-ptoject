@@ -110,13 +110,13 @@
           >
             @if (task.assignedDate) {
               <span>
-                <fa-icon [icon]="['far', 'calendar']" class="mr-1"></fa-icon>
+                <fa-icon [icon]="['far', 'calendar']" class="me-1"></fa-icon>
                 {{ 'assignedTime' | translate }} {{ task.assignedDate | date: 'mediumDate' }}
               </span>
             }
             @if (task.dueDate) {
               <span>
-                <fa-icon [icon]="['far', 'clock']" class="mr-1"></fa-icon>
+                <fa-icon [icon]="['far', 'clock']" class="me-1"></fa-icon>
                 {{ 'due' | translate }} {{ task.dueDate | date: 'mediumDate' }}
               </span>
             }

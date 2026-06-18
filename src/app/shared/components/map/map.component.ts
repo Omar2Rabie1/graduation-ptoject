@@ -65,7 +65,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
     this.map = L.map(hostEl, { zoomControl: true });
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      attribution: '© OpenStreetMap contributors',
+      attribution: 'Â© OpenStreetMap contributors',
     }).addTo(this.map);
 
     this.markersLayer = L.layerGroup().addTo(this.map);
@@ -142,15 +142,12 @@ export class MapComponent implements AfterViewInit, OnChanges {
       if (!Number.isFinite(lat) || !Number.isFinite(lng)) continue;
 
       const type = marker.type?.trim();
-      const palette = this.paletteForType(type);
+      const isFocused = !!focusId && marker.id?.toString() === focusId;
+      const customIcon = this.customIconForType(type, isFocused);
 
-      // Colored marker by type (focused marker stays deep red)
-      const leafletMarker = L.circleMarker([lat, lng], {
-        radius: 8,
-        color: palette.stroke,
-        weight: 2,
-        fillColor: palette.fill,
-        fillOpacity: 0.95,
+      // Custom marker icon by category
+      const leafletMarker = L.marker([lat, lng], {
+        icon: customIcon
       }).addTo(this.markersLayer);
 
       if (marker.id) {
@@ -189,14 +186,6 @@ export class MapComponent implements AfterViewInit, OnChanges {
       if (focusId && marker.id?.toString() === focusId) {
         focusedLatLng = [lat, lng];
         focusedLayer = leafletMarker;
-        // Make the focused marker slightly larger/darker
-        (leafletMarker as L.CircleMarker).setStyle({
-          radius: 11,
-          color: '#7f1d1d',
-          weight: 3,
-          fillColor: '#dc2626',
-          fillOpacity: 1,
-        });
       }
     }
 
@@ -211,7 +200,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
     // Focus specific report when coming from "Open Map"
     if (focusedLatLng) {
       this.map.setView(focusedLatLng, 13, { animate: true });
-      const layer = focusedLayer as L.CircleMarker;
+      const layer = focusedLayer as L.Marker;
       if (layer?.openPopup) {
         layer.openPopup();
       }
@@ -220,32 +209,69 @@ export class MapComponent implements AfterViewInit, OnChanges {
   }
 
   private startPulse(layer: L.Layer | null): void {
-    if (this.pulseTimer) {
-      window.clearInterval(this.pulseTimer);
-      this.pulseTimer = undefined;
+    // Pulse animation is handled via CSS map-marker-focused animation applied to divIcon
+  }
+
+  private customIconForType(type?: string | null, isFocused: boolean = false): L.DivIcon {
+    const t = (type ?? '').toLowerCase();
+    let fillColor = '#ef4444'; // Red (Default)
+    let glowColor = 'rgba(239, 68, 68, 0.4)';
+    let svgPath = '<path d="M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z" fill="currentColor"/>'; // Triangle Warning
+
+    if (t.includes('road')) {
+      fillColor = '#f97316'; // Orange
+      glowColor = 'rgba(249, 115, 22, 0.4)';
+      svgPath = '<path d="M19 20H5v2h14v-2zm-2-7h-2.1L13.1 3H10.9L9.1 13H7v2h10v-2z" fill="currentColor"/>'; // Traffic Cone
+    } else if (t.includes('power') || t.includes('electrical')) {
+      fillColor = '#eab308'; // Yellow
+      glowColor = 'rgba(234, 179, 8, 0.4)';
+      svgPath = '<path d="M13 10V2L4 14h7v8l9-12h-7z" fill="currentColor"/>'; // Bolt
+    } else if (t.includes('water')) {
+      fillColor = '#3b82f6'; // Blue
+      glowColor = 'rgba(59, 130, 246, 0.4)';
+      svgPath = '<path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" fill="currentColor"/>'; // Droplet
+    } else if (t.includes('sanitation')) {
+      fillColor = '#10b981'; // Green
+      glowColor = 'rgba(16, 185, 129, 0.4)';
+      svgPath = '<path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" fill="currentColor"/>'; // Trash can
     }
 
-    const cm = layer as unknown as L.CircleMarker | null;
-    if (!cm || typeof cm.setStyle !== 'function') return;
+    if (isFocused) {
+      fillColor = '#dc2626'; // Deep red
+      glowColor = 'rgba(220, 38, 38, 0.6)';
+    }
 
-    const start = Date.now();
-    const baseRadius = 11;
-    const maxRadius = 15;
+    const size = isFocused ? 38 : 32;
+    const padding = isFocused ? 7 : 6;
+    const focusedClass = isFocused ? 'map-marker-focused' : '';
 
-    this.pulseTimer = window.setInterval(() => {
-      const t = Date.now() - start;
-      if (t > 2600) {
-        cm.setStyle({ radius: baseRadius });
-        if (this.pulseTimer) window.clearInterval(this.pulseTimer);
-        this.pulseTimer = undefined;
-        return;
-      }
+    const htmlContent = `
+      <div style="
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: ${size}px;
+        height: ${size}px;
+        border-radius: 50%;
+        background: ${fillColor};
+        border: 2px solid #ffffff;
+        color: #ffffff;
+        --pulse-color: ${glowColor};
+        box-shadow: 0 0 10px ${glowColor}, 0 4px 6px -1px rgba(0, 0, 0, 0.3);
+      " class="map-custom-marker ${focusedClass}">
+        <svg viewBox="0 0 24 24" style="width: ${size - padding * 2}px; height: ${size - padding * 2}px;" xmlns="http://www.w3.org/2000/svg">
+          ${svgPath}
+        </svg>
+      </div>
+    `;
 
-      const phase = (t % 600) / 600; // 0..1
-      const pulse = Math.sin(phase * Math.PI); // 0..1..0
-      const r = baseRadius + (maxRadius - baseRadius) * pulse;
-      cm.setStyle({ radius: r });
-    }, 50);
+    return L.divIcon({
+      html: htmlContent,
+      className: '',
+      iconSize: [size, size],
+      iconAnchor: [size / 2, size / 2],
+      popupAnchor: [0, -size / 2]
+    });
   }
 
   private isInsideEgypt(lat: number, lng: number): boolean {
@@ -293,7 +319,7 @@ export class MapComponent implements AfterViewInit, OnChanges {
         },
       }).addTo(this.map);
     } catch {
-      // ignore — map still works without admin layer
+      // ignore â€” map still works without admin layer
     }
 
   }

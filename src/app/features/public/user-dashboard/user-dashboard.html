@@ -9,7 +9,7 @@
 
   <!-- Sidebar -->
   <aside 
-    class="fixed lg:static inset-y-0 left-0 flex w-[260px] min-h-screen flex-col border-r border-brand-border bg-brand-surface px-4 py-5 text-brand-text z-[1100] shadow-2xl transition-transform duration-300"
+    class="fixed lg:static inset-y-0 start-0 flex w-[260px] min-h-screen flex-col border-e border-brand-border bg-brand-surface px-4 py-5 text-brand-text z-[1100] shadow-2xl transition-transform duration-300"
     [class.-translate-x-full]="!isSidebarOpen"
     [class.translate-x-0]="isSidebarOpen"
   >
@@ -25,17 +25,17 @@
     </div>
 
     <nav class="flex flex-col gap-[0.35rem] text-[0.9rem]">
-      <button (click)="setView('map')" [class.bg-brand-surface-light]="currentView === 'map'" [class.text-brand-primary]="currentView === 'map'" [class.border-brand-primary]="currentView === 'map'" [class.border-r-2]="currentView === 'map'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+      <button (click)="setView('map')" [class.bg-brand-surface-light]="currentView === 'map'" [class.text-brand-primary]="currentView === 'map'" [class.border-brand-primary]="currentView === 'map'" [class.border-e-2]="currentView === 'map'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-start">
         <span class="size-2 shrink-0 rounded-full bg-green-500"></span>
         {{ 'reportIssue' | translate }}
       </button>
 
-      <button (click)="setView('reports')" [class.bg-brand-surface-light]="currentView === 'reports'" [class.text-brand-primary]="currentView === 'reports'" [class.border-brand-primary]="currentView === 'reports'" [class.border-r-2]="currentView === 'reports'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+      <button (click)="setView('reports')" [class.bg-brand-surface-light]="currentView === 'reports'" [class.text-brand-primary]="currentView === 'reports'" [class.border-brand-primary]="currentView === 'reports'" [class.border-e-2]="currentView === 'reports'" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-start">
         <span class="size-2 shrink-0 rounded-full bg-brand-primary"></span>
         {{ 'myReports' | translate }}
       </button>
 
-      <button (click)="goToProfile()" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-left">
+      <button (click)="goToProfile()" class="flex items-center gap-2 rounded-lg px-3 py-[0.55rem] text-brand-muted no-underline transition-all duration-150 ease-out hover:bg-brand-surface-light hover:text-brand-text-primary w-full text-start">
         <span class="size-2 shrink-0 rounded-full bg-blue-500"></span>
         {{ 'myProfile' | translate }}
       </button>
@@ -141,7 +141,7 @@
       <div class="space-y-6 flex-1">
         <!-- Loop modified to use pagedReports -->
         <div *ngFor="let report of pagedReports" class="glass-panel rounded-[24px] p-6 sm:p-8 flex flex-col md:flex-row justify-between items-start gap-6 hover:bg-brand-surface transition-all">
-           <div class="flex-1 pr-0 md:pr-10 w-full">
+           <div class="flex-1 pe-0 md:pe-10 w-full">
               <div class="flex items-center gap-4 mb-4">
                   <span class="text-[10px] font-black text-brand-muted bg-brand-surface-light px-3 py-1 rounded-md">#{{report.id}}</span>
                   <span [class]="report.statusBg" class="text-[9px] font-black px-3 py-1 rounded-full uppercase tracking-widest">{{ report.status | translate }}</span>
@@ -149,7 +149,7 @@
               <h3 class="text-2xl sm:text-3xl font-bold mb-4 text-brand-text-primary">{{ report.title | translate }}</h3>
               <p class="text-sm text-brand-muted leading-relaxed">{{ report.desc | translate }}</p>
               <div class="mt-6 flex flex-wrap items-center gap-6">
-                  <span class="text-[11px] text-brand-muted font-bold uppercase tracking-widest"><fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary mr-2"></fa-icon> {{ report.location | translate }}</span>
+                  <span class="text-[11px] text-brand-muted font-bold uppercase tracking-widest"><fa-icon [icon]="['fas', 'location-dot']" class="text-brand-primary me-2"></fa-icon> {{ report.location | translate }}</span>
                   
                   <div *ngIf="isResolved(report.status)" class="flex items-center gap-3">
                     <button (click)="confirmFix(report.id)" class="px-4 py-2 bg-emerald-600/20 hover:bg-emerald-600 text-emerald-400 hover:text-white text-xs font-bold rounded-xl border border-emerald-500/30 transition-all flex items-center gap-2 cursor-pointer shadow-md shadow-emerald-950/20">
@@ -197,7 +197,7 @@
   </main>
 
   <!-- Submission Panel -->
-  <aside *ngIf="showReportPanel && currentView === 'map'" class="w-full sm:w-[480px] h-full bg-brand-surface glass-panel border-l border-brand-border p-6 sm:p-10 md:p-12 z-[2000] shadow-2xl animate-slide-in absolute right-0 overflow-y-auto">
+  <aside *ngIf="showReportPanel && currentView === 'map'" class="w-full sm:w-[480px] h-full bg-brand-surface glass-panel border-s border-brand-border p-6 sm:p-10 md:p-12 z-[2000] shadow-2xl animate-slide-in absolute end-0 overflow-y-auto">
       <div class="flex justify-between items-center mb-12">
         <h2 class="text-sm font-bold uppercase tracking-wider text-brand-text-primary">{{ 'submitNewReport' | translate }}</h2>
         <button (click)="toggleReportPanel()" class="text-brand-muted hover:text-brand-text-primary transition-colors"><fa-icon [icon]="['fas', 'xmark']" class="text-xl"></fa-icon></button>
@@ -209,11 +209,16 @@
             <input type="file" #fileInput accept="image/*" class="hidden">
             <div class="flex gap-3 h-32">
               <div *ngFor="let img of imagePreviews; let i = index" 
-                   (click)="!isAiLoading && triggerFileInput(i)" 
-                   [class.pointer-events-none]="isAiLoading"
-                   class="relative flex-1 bg-brand-bg border border-brand-border rounded-[16px] flex items-center justify-center cursor-pointer border-dashed overflow-hidden hover:border-brand-primary/50 transition-all">
-                <img *ngIf="img" [src]="img" class="w-full h-full object-cover" [class.opacity-40]="isAiLoading">
-                <span *ngIf="!img && !isAiLoading" class="text-2xl text-brand-primary font-bold">+</span>
+                   class="relative flex-1 bg-brand-bg border border-brand-border rounded-[16px] flex items-center justify-center border-dashed overflow-hidden hover:border-brand-primary/50 transition-all">
+                <div (click)="!isAiLoading && triggerFileInput(i)" [class.pointer-events-none]="isAiLoading" class="w-full h-full flex items-center justify-center cursor-pointer">
+                  <img *ngIf="img" [src]="img" class="w-full h-full object-cover" [class.opacity-40]="isAiLoading">
+                  <span *ngIf="!img && !isAiLoading" class="text-2xl text-brand-primary font-bold">+</span>
+                </div>
+                
+                <!-- Clear Button -->
+                <button *ngIf="img && !isAiLoading" type="button" (click)="removeSelectedFile($event, i)" class="absolute top-1.5 right-1.5 z-10 size-6 rounded-full bg-red-600/90 text-white flex items-center justify-center hover:bg-red-500 transition-colors border-0 cursor-pointer shadow-md">
+                  <fa-icon [icon]="['fas', 'xmark']" class="text-xs"></fa-icon>
+                </button>
                 
                 <!-- Loading overlay and spinner for analyzing images -->
                 <div *ngIf="isAiLoading && img" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-2">
