@@ -16,12 +16,12 @@ export interface AdminUser {
 
 export interface CreateUserDto {
   name: string;
+  fullName: string;
   email: string;
   phoneNumber: string;
   password?: string;
   role: string;
   specialization?: string;
-  fullName?: string; // Added to match frontend model
 }
 
 export interface CreateUserResponse {

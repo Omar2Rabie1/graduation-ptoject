@@ -48,7 +48,8 @@ import {
   faEyeSlash,
   faLandmark,
   faClipboardList,
-  faSpinner
+  faSpinner,
+  faTrash
 } from '@fortawesome/free-solid-svg-icons';
 
 import {
@@ -117,6 +118,7 @@ export const appIcons = [
   faLandmark,
   faClipboardList,
   faSpinner,
+  faTrash,
   // Regular
   farCalendar,
   farClock,

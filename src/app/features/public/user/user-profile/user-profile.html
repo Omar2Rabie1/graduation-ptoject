@@ -22,7 +22,7 @@
       
       <!-- Profile Sidebar Card -->
       <div class="glass-panel rounded-[24px] p-8 flex flex-col items-center shadow-2xl animate-slide-up">
-        <div class="relative mb-6 cursor-pointer group" (click)="photoInput.click()">
+        <div class="relative mb-4 cursor-pointer group" (click)="photoInput.click()">
           <input type="file" #photoInput (change)="onPhotoSelected($event)" accept="image/*" class="hidden">
           <div class="size-32 rounded-full bg-gradient-to-br from-brand-primary to-orange-300 text-4xl font-black flex items-center justify-center overflow-hidden border-4 border-brand-bg shadow-[0_0_40px_rgba(242,122,66,0.2)] text-white relative">
             <img *ngIf="profilePictureUrl" [src]="profilePictureUrl" class="w-full h-full object-cover">
@@ -33,6 +33,16 @@
           </div>
           <!-- Online Indicator -->
           <div class="absolute bottom-2 right-2 size-5 bg-green-500 rounded-full border-4 border-brand-bg"></div>
+        </div>
+        
+        <!-- Photo Actions (Change and Remove) -->
+        <div class="flex gap-2.5 mb-6">
+          <button (click)="photoInput.click()" class="px-3.5 py-1.5 text-[11px] font-bold rounded-xl bg-brand-primary/10 text-brand-primary border border-brand-primary/20 hover:bg-brand-primary hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+            <fa-icon [icon]="['fas', 'camera']"></fa-icon> {{ 'change' | translate }}
+          </button>
+          <button *ngIf="profilePictureUrl" (click)="deletePhoto()" class="px-3.5 py-1.5 text-[11px] font-bold rounded-xl bg-red-500/10 text-red-400 border border-red-500/20 hover:bg-red-500 hover:text-white transition-all flex items-center gap-1.5 cursor-pointer shadow-sm">
+            <fa-icon [icon]="['fas', 'trash']"></fa-icon> {{ 'remove' | translate }}
+          </button>
         </div>
         
         <h2 class="text-2xl font-bold mb-1 text-center text-brand-text-primary">{{ userName }}</h2>

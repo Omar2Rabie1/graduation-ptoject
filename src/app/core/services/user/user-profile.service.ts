@@ -50,6 +50,10 @@ export class UserProfileService {
     return this.http.put<unknown>(`${this.base}/profile-management/photo`, formData);
   }
 
+  deleteProfilePhoto(): Observable<unknown> {
+    return this.http.delete<unknown>(`${this.base}/profile-management/photo`);
+  }
+
   changePassword(currentPassword: string, newPassword: string, confirmNewPassword: string): Observable<unknown> {
     return this.http.post<unknown>(`${this.base}/Profile/change-password`, {
       currentPassword,

@@ -16,9 +16,11 @@ export class AiClassificationService {
 
   constructor(private readonly http: HttpClient) {}
 
-  classifyImage(file: File): Observable<AiClassifyResponse> {
+  classifyImages(files: File[]): Observable<AiClassifyResponse> {
     const form = new FormData();
-    form.append('files', file);
+    files.forEach(file => {
+      form.append('files', file);
+    });
     return this.http
       .post<AiClassifyResponse>(this.apiUrl, form)
       .pipe(

@@ -107,6 +107,7 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     this.isSaving = true;
+    this.cdr.detectChanges();
     const { name, mobile } = this.profileForm.value;
     const sanitizedPhone = mobile ? String(mobile).replace(/[\s\-\(\)]/g, '') : null;
     this.profileService.updateProfileInfo({ name, phoneNumber: sanitizedPhone }).subscribe({
@@ -122,6 +123,7 @@ export class UserProfileComponent implements OnInit {
       },
       error: err => {
         this.isSaving = false;
+        this.cdr.detectChanges();
         this.notification.error(err?.error?.message || 'Failed to update profile info');
       }
     });
@@ -159,6 +161,7 @@ export class UserProfileComponent implements OnInit {
     const file = input.files?.[0];
     if (!file) return;
     this.isSaving = true;
+    this.cdr.detectChanges();
     this.profileService.updateProfilePhoto(file).subscribe({
       next: () => {
         this.isSaving = false;
@@ -168,7 +171,26 @@ export class UserProfileComponent implements OnInit {
       },
       error: err => {
         this.isSaving = false;
+        this.cdr.detectChanges();
         this.notification.error(err?.error?.message || 'Failed to upload profile photo');
+      }
+    });
+  }
+
+  deletePhoto(): void {
+    this.isSaving = true;
+    this.cdr.detectChanges();
+    this.profileService.deleteProfilePhoto().subscribe({
+      next: () => {
+        this.isSaving = false;
+        this.profilePictureUrl = null;
+        this.cdr.detectChanges();
+        this.notification.success('Profile photo removed successfully!');
+      },
+      error: err => {
+        this.isSaving = false;
+        this.cdr.detectChanges();
+        this.notification.error(err?.error?.message || 'Failed to remove profile photo');
       }
     });
   }
@@ -187,6 +209,7 @@ export class UserProfileComponent implements OnInit {
       return;
     }
     this.isChangingPassword = true;
+    this.cdr.detectChanges();
     this.profileService.changePassword(currentPassword, newPassword, confirmNewPassword).subscribe({
       next: () => {
         this.isChangingPassword = false;
@@ -196,6 +219,7 @@ export class UserProfileComponent implements OnInit {
       },
       error: err => {
         this.isChangingPassword = false;
+        this.cdr.detectChanges();
         this.notification.error(err?.error?.message || 'Failed to change password');
       }
     });

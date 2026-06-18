@@ -13,9 +13,8 @@
     [class.-translate-x-full]="!isSidebarOpen"
     [class.translate-x-0]="isSidebarOpen"
   >
-    <div class="mb-6 flex items-center gap-3 px-2">
-      <input type="file" #profileInput (change)="onProfilePicSelected($event)" accept="image/*" class="hidden">
-      <div (click)="profileInput.click()" class="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-orange-300 text-base font-semibold cursor-pointer overflow-hidden border border-brand-border transition-all text-white shadow-md">
+    <div (click)="goToProfile()" class="mb-6 flex items-center gap-3 px-2 py-1.5 cursor-pointer hover:bg-brand-surface-light rounded-xl transition-all">
+      <div class="flex size-10 shrink-0 items-center justify-center rounded-full bg-gradient-to-br from-brand-primary to-orange-300 text-base font-semibold overflow-hidden border border-brand-border text-white shadow-md">
         <img *ngIf="profilePicPreview" [src]="profilePicPreview" class="w-full h-full object-cover">
         <span *ngIf="!profilePicPreview" class="text-xl font-black">{{ userInitial }}</span>
       </div>
@@ -210,14 +209,14 @@
             <input type="file" #fileInput accept="image/*" class="hidden">
             <div class="flex gap-3 h-32">
               <div *ngFor="let img of imagePreviews; let i = index" 
-                   (click)="!(isAiLoading && i === 0) && triggerFileInput(i)" 
-                   [class.pointer-events-none]="isAiLoading && i === 0"
+                   (click)="!isAiLoading && triggerFileInput(i)" 
+                   [class.pointer-events-none]="isAiLoading"
                    class="relative flex-1 bg-brand-bg border border-brand-border rounded-[16px] flex items-center justify-center cursor-pointer border-dashed overflow-hidden hover:border-brand-primary/50 transition-all">
-                <img *ngIf="img" [src]="img" class="w-full h-full object-cover" [class.opacity-40]="isAiLoading && i === 0">
-                <span *ngIf="!img && !(isAiLoading && i === 0)" class="text-2xl text-brand-primary font-bold">+</span>
+                <img *ngIf="img" [src]="img" class="w-full h-full object-cover" [class.opacity-40]="isAiLoading">
+                <span *ngIf="!img && !isAiLoading" class="text-2xl text-brand-primary font-bold">+</span>
                 
-                <!-- Loading overlay and spinner for slot 0 (first uploaded image) -->
-                <div *ngIf="isAiLoading && i === 0" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-2">
+                <!-- Loading overlay and spinner for analyzing images -->
+                <div *ngIf="isAiLoading && img" class="absolute inset-0 flex flex-col items-center justify-center bg-black/50 text-white p-2">
                   <fa-icon [icon]="['fas', 'spinner']" [animation]="'spin'" class="text-2xl text-brand-primary mb-1"></fa-icon>
                   <span class="text-[10px] font-semibold tracking-wide">Analyzing...</span>
                 </div>

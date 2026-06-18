@@ -94,6 +94,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Citizen dashboard & profile
     myProfile: 'My Profile',
     edit: 'Edit',
+    change: 'Change',
+    remove: 'Remove',
     publicUser: 'Public User',
     reports: 'Reports',
     resolved: 'Resolved',
@@ -417,6 +419,8 @@ export const translations: Record<Lang, Record<string, string>> = {
     // Citizen dashboard & profile
     myProfile: 'ملفي الشخصي',
     edit: 'تعديل',
+    change: 'تغيير',
+    remove: 'إزالة',
     publicUser: 'مواطن',
     reports: 'البلاغات',
     resolved: 'تم حلها',

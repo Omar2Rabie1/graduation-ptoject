@@ -63,15 +63,13 @@ import { LanguageService } from '../../../../i18n/language.service';
               <label class="text-[10px] text-brand-muted uppercase tracking-wider font-medium">{{ 'selectRole' | translate }}</label>
               <select class="h-[42px] bg-brand-bg border border-brand-border rounded-lg px-3 text-sm text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary w-full transition-all"
                       [(ngModel)]="user.role" name="role">
-                <option value="Worker">{{ 'maintenanceCrew' | translate }}</option>
-                <option value="Authority">{{ 'municipalAuthority' | translate }}</option>
-                <option value="Admin">{{ 'adminRole' | translate }}</option>
-                <option value="Public User">{{ 'publicUser' | translate }}</option>
+                <option value="Worker">Worker</option>
+                <option value="Authority">Authority</option>
               </select>
             </div>
 
             <!-- Specialty -->
-            <div class="flex flex-col gap-2">
+            <div *ngIf="user.role === 'Worker'" class="flex flex-col gap-2">
               <label class="text-[10px] text-brand-muted uppercase tracking-wider font-medium">{{ 'specialty' | translate }}</label>
               <select class="h-[42px] bg-brand-bg border border-brand-border rounded-lg px-3 text-sm text-white focus:outline-none focus:border-brand-primary focus:ring-1 focus:ring-brand-primary w-full transition-all"
                       [(ngModel)]="user.specialty" name="specialty">
@@ -119,7 +117,7 @@ export class CreateUserPageComponent {
   constructor(
     private adminUsersService: AdminUsersService,
     private auditLogsService: AuditLogsService
-  ) {}
+  ) { }
 
   resetForm() {
     this.user = {
@@ -144,7 +142,7 @@ export class CreateUserPageComponent {
     this.isLoading = true;
     this.message = '';
     this.hasError = false;
-    
+
     // Mapping payload to match generic backend expectations if needed
     const payload: CreateUserDto = {
       name: this.user.fullName,
@@ -152,14 +150,14 @@ export class CreateUserPageComponent {
       email: this.user.email,
       phoneNumber: this.user.phone,
       role: this.user.role,
-      specialization: this.user.specialty
+      specialization: this.user.role === 'Worker' ? this.user.specialty : undefined
     };
 
     this.adminUsersService.createUser(payload).subscribe({
       next: (res) => {
         this.isLoading = false;
         this.hasError = false;
-        
+
         // Add audit log for the new user
         this.auditLogsService.addLocalLog({
           action: 'Create User',
@@ -174,7 +172,7 @@ export class CreateUserPageComponent {
       error: (err) => {
         this.isLoading = false;
         this.hasError = true;
-        
+
         // Handle ASP.NET Core validation errors
         if (err.error?.errors) {
           const firstErrorKey = Object.keys(err.error.errors)[0];

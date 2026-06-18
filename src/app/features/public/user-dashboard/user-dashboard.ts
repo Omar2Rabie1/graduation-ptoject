@@ -62,6 +62,7 @@ export class UserDashboard implements OnInit {
   typeFilter = new Set<string>();
 
   userId: string = '';
+  private analysisTimeout: any = null;
   private nearbyMarkersSource = new BehaviorSubject<MapMarker[]>([]);
   nearbyMarkers$ = this.nearbyMarkersSource.asObservable();
 
@@ -155,21 +156,29 @@ export class UserDashboard implements OnInit {
       const reader = new FileReader();
       reader.onload = () => {
         this.imagePreviews[index] = reader.result as string;
+        this.cdr.detectChanges();
       };
       reader.readAsDataURL(file);
 
-      // Perform AI classification on the first uploaded image (index 0) only
-      if (index === 0) {
-        this.classifyFirstImage(file);
+      // Debounce to allow selection of multiple files before triggering classification
+      if (this.analysisTimeout) {
+        clearTimeout(this.analysisTimeout);
       }
+      this.analysisTimeout = setTimeout(() => {
+        this.classifyAllSelectedImages();
+      }, 1000);
     }
   }
 
-  private classifyFirstImage(file: File): void {
+  private classifyAllSelectedImages(): void {
+    const activeFiles = this.selectedFiles.filter((f): f is File => f !== null);
+    if (activeFiles.length === 0) return;
+
     if (this.isAnalyzing) return;
     this.isAnalyzing = true;
+    this.cdr.detectChanges();
 
-    this.aiService.classifyImage(file).pipe(
+    this.aiService.classifyImages(activeFiles).pipe(
       finalize(() => {
         this.isAnalyzing = false;
         this.cdr.detectChanges();
