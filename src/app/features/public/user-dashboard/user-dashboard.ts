@@ -269,69 +269,69 @@ export class UserDashboard implements OnInit {
     // but since we rely on map clicks, we can just let them use the search string.
   }
 
-  submitForm(descElem: HTMLTextAreaElement, categoryElem: HTMLSelectElement) {
-    if (!descElem.value || !this.locationInput) return;
+ submitForm(descElem: HTMLTextAreaElement, categoryElem: HTMLSelectElement) {
+  if (!descElem.value || !this.locationInput) return;
 
-    const firstFile = this.selectedFiles.find(f => f !== null);
-    if (!firstFile) {
-      this.notification.warning('Please upload at least one evidence photo.');
-      return;
-    }
+  const validFiles = this.selectedFiles.filter((f): f is File => f !== null);
+  if (validFiles.length === 0) {
+    this.notification.warning('Please upload at least one evidence photo.');
+    return;
+  }
 
-    const catId = this.getCategoryId(categoryElem.value);
-    const lat = this.selectedLat ?? 30.0444;
-    const lng = this.selectedLng ?? 31.2357;
+  const catId = this.getCategoryId(categoryElem.value);
+  const lat = this.selectedLat ?? 30.0444;
+  const lng = this.selectedLng ?? 31.2357;
 
-    this.publicMapApi.submitReport(catId, descElem.value, lat, lng, firstFile).subscribe({
-      next: () => {
-        this.notification.success('Report submitted successfully!');
-        if (this.mapComponent) {
-          this.mapComponent.clearUserPin();
-        }
-        this.selectedLat = undefined;
-        this.selectedLng = undefined;
-        this.currentPage = 1;
-        this.showReportPanel = false;
-        this.imagePreviews = ['', '', ''];
-        this.selectedFiles = [null, null, null];
-        this.locationInput = '';
-        descElem.value = '';
-        this.aiConfidence = null;
-        this.isAiLoading = false;
-        this.setView('map');
-        this.fetchNearbyReports();
-        this.loadUserReports();
-        this.cdr.detectChanges();
-      },
-      error: (err) => {
-        console.error('Failed to submit report', err);
-        let errorMsg = 'Failed to submit report.';
-        if (err?.error?.errors) {
-          const validationErrors = err.error.errors;
-          const messages: string[] = [];
-          for (const key in validationErrors) {
-            if (Object.prototype.hasOwnProperty.call(validationErrors, key)) {
-              const errorsList = validationErrors[key];
-              if (Array.isArray(errorsList)) {
-                messages.push(`${key}: ${errorsList.join(', ')}`);
-              } else {
-                messages.push(`${key}: ${errorsList}`);
-              }
+  this.publicMapApi.submitReport(catId, descElem.value, lat, lng, validFiles).subscribe({
+    next: () => {
+      this.notification.success('Report submitted successfully!');
+      if (this.mapComponent) {
+        this.mapComponent.clearUserPin();
+      }
+      this.selectedLat = undefined;
+      this.selectedLng = undefined;
+      this.currentPage = 1;
+      this.showReportPanel = false;
+      this.imagePreviews = ['', '', ''];
+      this.selectedFiles = [null, null, null];
+      this.locationInput = '';
+      descElem.value = '';
+      this.aiConfidence = null;
+      this.isAiLoading = false;
+      this.setView('map');
+      this.fetchNearbyReports();
+      this.loadUserReports();
+      this.cdr.detectChanges();
+    },
+    error: (err) => {
+      console.error('Failed to submit report', err);
+      let errorMsg = 'Failed to submit report.';
+      if (err?.error?.errors) {
+        const validationErrors = err.error.errors;
+        const messages: string[] = [];
+        for (const key in validationErrors) {
+          if (Object.prototype.hasOwnProperty.call(validationErrors, key)) {
+            const errorsList = validationErrors[key];
+            if (Array.isArray(errorsList)) {
+              messages.push(`${key}: ${errorsList.join(', ')}`);
+            } else {
+              messages.push(`${key}: ${errorsList}`);
             }
           }
-          if (messages.length > 0) {
-            errorMsg = `Validation errors:\n` + messages.join('\n');
-          }
-        } else if (err?.error?.message) {
-          errorMsg = err.error.message;
-        } else if (err?.message) {
-          errorMsg = err.message;
         }
-        this.notification.error(errorMsg);
-        this.cdr.detectChanges();
+        if (messages.length > 0) {
+          errorMsg = `Validation errors:\n` + messages.join('\n');
+        }
+      } else if (err?.error?.message) {
+        errorMsg = err.error.message;
+      } else if (err?.message) {
+        errorMsg = err.message;
       }
-    });
-  }
+      this.notification.error(errorMsg);
+      this.cdr.detectChanges();
+    }
+  });
+}
 
   private getCategoryId(categoryName: string): number {
     const name = categoryName?.toLowerCase() || '';

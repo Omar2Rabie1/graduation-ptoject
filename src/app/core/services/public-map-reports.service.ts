@@ -136,20 +136,19 @@ export class PublicMapReportsService {
     return this.http.post<unknown>(`${this.base}/public/reports/${reportId}/also-suffer`, {});
   }
 
-  submitReport(categoryId: number, description: string, latitude: number, longitude: number, file: File): Observable<unknown> {
+  submitReport(categoryId: number, description: string, latitude: number, longitude: number, files: File[]): Observable<unknown> {
     const formData = new FormData();
     formData.append('CategoryId', categoryId.toString());
     formData.append('Description', description);
     formData.append('Latitude', latitude.toString());
     formData.append('Longitude', longitude.toString());
-    if (file) {
-      const keys = [
-        'file', 'File', 'image', 'Image', 'photo', 'Photo',
-        'reportPic', 'ReportPic', 'reportImage', 'ReportImage',
-        'evidence', 'Evidence', 'pic', 'Pic'
-      ];
-      keys.forEach(k => formData.append(k, file));
-    }
+
+    files.forEach(file => {
+      if (file) {
+        formData.append('Images', file);
+      }
+    });
+
     return this.http.post<unknown>(`${this.base}/public/report/submit`, formData);
   }
 }
